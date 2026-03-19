@@ -900,7 +900,20 @@ async function loadFromSb(){
     var rC=await fetch(sbUrl+'/rest/v1/clients?select=*&order=sessions.desc&limit=1000',{headers:{'apikey':sbKey,'Authorization':'Bearer '+sbKey}});
     var rR=await fetch(sbUrl+'/rest/v1/recordatoris?select=*&order=data.asc',{headers:{'apikey':sbKey,'Authorization':'Bearer '+sbKey}});
     var ds=await rS.json(), dc=await rC.json(), dr=await rR.json();
-    if(Array.isArray(dc)&&dc.length) clients=dc;
+    if(Array.isArray(dc)&&dc.length){
+      // Merge: preserve local telefon/poblacio if Supabase returns null
+      var localMap={};
+      for(var i=0;i<clients.length;i++) localMap[clients[i].id]=clients[i];
+      dc.forEach(function(c){
+        var local=localMap[c.id];
+        if(local){
+          if(!c.telefon && local.telefon) c.telefon=local.telefon;
+          if(!c.poblacio && local.poblacio) c.poblacio=local.poblacio;
+          if(!c.notes && local.notes) c.notes=local.notes;
+        }
+      });
+      clients=dc;
+    }
     if(Array.isArray(ds)&&ds.length) sessions=ds;
     if(Array.isArray(dr)) reminders=dr;
     nextCid=Math.max.apply(null,clients.map(function(c){ return c.id||0; }).concat([0]))+1;
@@ -1180,12 +1193,13 @@ async function doEditClient() {
   var nom  = (gv('ec-nom')||'').trim();
   var codi = (gv('ec-codi')||'').trim();
   if(!nom) return;
+  // Update local object directly
   c.base    = nom;
   c.codi    = codi;
   c.nom     = codi ? nom + ' ' + codi : nom;
-  c.telefon = (gv('ec-tel')||'').trim();
-  var pobEl = ge('ec-pob'); if(pobEl) c.poblacio = pobEl.value.trim();
-  var notEl = ge('ec-notes-c'); if(notEl) c.notes = notEl.value.trim();
+  c.telefon = (gv('ec-tel')||'').trim() || null;
+  c.poblacio = ge('ec-pob') ? (ge('ec-pob').value.trim() || null) : null;
+  c.notes   = ge('ec-notes-c') ? (ge('ec-notes-c').value.trim() || null) : null;
   c.servei_habitual = gv('ec-srv');
   c.categoria_principal = catOf(c.servei_habitual);
   // Show saving indicator
