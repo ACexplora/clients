@@ -434,6 +434,9 @@ function fmtM(k){
   var p=String(k).split('-');
   return mn[parseInt(p[1]||0)]+' '+(p[0]||'');
 }
+function fmtNum(n){
+  return String(parseInt(n)||0).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+}
 
 function estatB(e){
   if(e==='Completat') return '<span class="badge bg">Completat</span>';
@@ -598,30 +601,30 @@ function drawPagaments(){
   var mesTot=paid.filter(function(s){ return String(s.data).startsWith(mk); }).reduce(function(a,s){ return a+s.preu; },0);
   var nC=sessions.filter(function(s){ return s.estat==='Completat'; }).length;
   var tiq=nC>0?Math.round(total/nC):0;
-  ge('p-met').innerHTML='<div class="met"><div class="mv">'+total+'€</div><div class="ml">Total cobrat</div></div>'
-    +'<div class="met"><div class="mv">'+mesTot+'€</div><div class="ml">Aquest mes</div></div>'
+  ge('p-met').innerHTML='<div class="met"><div class="mv">'+fmtNum(total)+'€</div><div class="ml">Total cobrat</div></div>'
+    +'<div class="met"><div class="mv">'+fmtNum(mesTot)+'€</div><div class="ml">Aquest mes</div></div>'
     +'<div class="met"><div class="mv">'+nC+'</div><div class="ml">Completades</div></div>'
-    +'<div class="met"><div class="mv">'+tiq+'€</div><div class="ml">Tiquet mitjà</div></div>';
+    +'<div class="met"><div class="mv">'+fmtNum(tiq)+'€</div><div class="ml">Tiquet mitjà</div></div>';
   var months=[];
   for(var i=11;i>=0;i--){ var d=new Date(); d.setMonth(d.getMonth()-i); months.push(d.toISOString().slice(0,7)); }
   var vals=months.map(function(m){ return paid.filter(function(s){ return String(s.data).startsWith(m); }).reduce(function(a,s){ return a+s.preu; },0); });
   var maxV=Math.max.apply(null,vals.concat([1]));
   ge('p-bars').innerHTML=vals.map(function(v,i){
-    return '<div class="bw" title="'+fmtM(months[i])+': '+v+'€"><div style="font-size:8px;font-weight:700;color:#0b6e55">'+(v||'')+'</div><div class="bar" style="height:'+Math.round(v/maxV*100)+'px;background:#0b6e55"></div></div>';
+    return '<div class="bw" title="'+fmtM(months[i])+': '+fmtNum(v)+'€"><div style="font-size:8px;font-weight:700;color:#0b6e55">'+(v||'')+'</div><div class="bar" style="height:'+Math.round(v/maxV*100)+'px;background:#0b6e55"></div></div>';
   }).join('');
   ge('p-blbl').innerHTML=months.map(function(m){ return '<span>'+m.slice(5)+'</span>'; }).join('');
   var pm={};
   sessions.filter(function(s){ return s.preu>0&&s.pagament; }).forEach(function(s){ pm[s.pagament]=(pm[s.pagament]||0)+s.preu; });
   var pmT=Object.values(pm).reduce(function(a,v){ return a+v; },0)||1;
   ge('p-mth').innerHTML=Object.entries(pm).sort(function(a,b){ return b[1]-a[1]; }).map(function(e,i){
-    return '<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span style="font-weight:600">'+e[0]+'</span><span style="font-weight:700">'+e[1]+'€ <span style="color:#aaa;font-weight:400">('+Math.round(e[1]/pmT*100)+'%)</span></span></div>'
+    return '<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span style="font-weight:600">'+e[0]+'</span><span style="font-weight:700">'+fmtNum(e[1])+'€ <span style="color:#aaa;font-weight:400">('+Math.round(e[1]/pmT*100)+'%)</span></span></div>'
       +'<div class="pb"><div class="pf" style="width:'+Math.round(e[1]/pmT*100)+'%;background:'+COLORS[i%COLORS.length]+'"></div></div></div>';
   }).join('');
   var recent=sessions.filter(function(s){ return s.preu>0; }).sort(function(a,b){ return String(b.data).localeCompare(String(a.data)); }).slice(0,80);
   ge('p-tb').innerHTML=recent.map(function(s){
     return '<tr><td style="font-size:11px">'+fd(s.data)+'</td><td style="font-size:12px">'+String(s.client||'')+'</td>'
       +'<td class="thide">'+(s.codi?'<span class="ctag">'+s.codi+'</span>':'—')+'</td>'
-      +'<td style="font-size:11px">'+String(s.servei||'')+'</td><td style="font-weight:700;color:#0b6e55">'+s.preu+'€</td>'
+      +'<td style="font-size:11px">'+String(s.servei||'')+'</td><td style="font-weight:700;color:#0b6e55">'+fmtNum(s.preu)+'€</td>'
       +'<td class="thide" style="font-size:11px;max-width:80px">'+String(s.pagament||'—')+'</td>'
       +'<td class="thide" style="font-size:11px;max-width:100px">'+String(s.terapeuta||'')+'</td></tr>';
   }).join('');
@@ -667,7 +670,7 @@ function progBarsAmt(elId,entries,total,amts){
   var t=total||1;
   el.innerHTML=entries.map(function(e,i){
     var pct=Math.round(e[1]/t*100);
-    var amt=amts[e[0]]?'<span style="color:#0b6e55;font-weight:700">&nbsp;· '+amts[e[0]]+'€</span>':'';
+    var amt=amts[e[0]]?'<span style="color:#0b6e55;font-weight:700">&nbsp;· '+fmtNum(amts[e[0]])+'€</span>':'';
     return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px">'
       +'<span style="font-weight:600">'+e[0]+'</span>'
       +'<span style="font-weight:700">'+e[1]+' ('+pct+'%)'+amt+'</span></div>'
@@ -685,12 +688,12 @@ function mesCard(key,data,label,elId){
   var catT=ing||1;
   var el=ge(elId); if(!el) return;
   el.innerHTML='<div class="stit">'+label+' <span style="font-size:12px;color:#aaa;font-weight:400">('+fmtM(key)+')</span></div>'
-    +'<div class="crow"><span style="color:#888">Ingressos</span><span style="font-weight:700;color:#0b6e55;font-size:16px">'+ing+'€</span></div>'
+    +'<div class="crow"><span style="color:#888">Ingressos</span><span style="font-weight:700;color:#0b6e55;font-size:16px">'+fmtNum(ing)+'€</span></div>'
     +'<div class="crow"><span style="color:#888">Sessions</span><span style="font-weight:600">'+all.length+'</span></div>'
     +'<div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em;margin:8px 0 5px">Per categoria</div>'
     +Object.entries(cats).sort(function(a,b){ return b[1]-a[1]; }).map(function(e,i){
       var pct=Math.round(e[1]/catT*100);
-      return '<div style="margin-bottom:7px"><div class="crow" style="border:none;padding:0 0 2px"><span>'+e[0]+'</span><span style="font-weight:700">'+e[1]+'€ ('+pct+'%)</span></div>'
+      return '<div style="margin-bottom:7px"><div class="crow" style="border:none;padding:0 0 2px"><span>'+e[0]+'</span><span style="font-weight:700">'+fmtNum(e[1])+'€ ('+pct+'%)</span></div>'
         +'<div class="pb"><div class="pf" style="width:'+pct+'%;background:'+COLORS[i%COLORS.length]+'"></div></div></div>';
     }).join('')
     +'<div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em;margin:10px 0 5px">Per terapeuta</div>'
@@ -703,7 +706,7 @@ function drawGraf(){
   var gd=filtG(), comp=gd.filter(function(s){ return s.estat==='Completat'; });
   var ing=comp.reduce(function(a,s){ return a+s.preu; },0), nC=comp.length;
   ge('g-met').innerHTML='<div class="met"><div class="mv">'+gd.length+'</div><div class="ml">Sessions</div></div>'
-    +'<div class="met"><div class="mv">'+ing+'€</div><div class="ml">Ingressos</div></div>'
+    +'<div class="met"><div class="mv">'+fmtNum(ing)+'€</div><div class="ml">Ingressos</div></div>'
     +'<div class="met"><div class="mv">'+nC+'</div><div class="ml">Completades</div></div>'
     +'<div class="met"><div class="mv">'+(nC>0?Math.round(ing/nC):0)+'€</div><div class="ml">Tiquet mitjà</div></div>';
   mesCard(mesKey(0),sessions,'Mes actual','g-act');
@@ -719,7 +722,7 @@ function drawGraf(){
   var evoV=evoMonths.map(function(mm){ return evoBase.filter(function(s){ return String(s.data).startsWith(mm)&&s.estat==='Completat'; }).reduce(function(a,s){ return a+s.preu; },0); });
   var maxE=Math.max.apply(null,evoV.concat([1]));
   ge('g-evbars').innerHTML=evoV.map(function(v,i){
-    return '<div class="bw" title="'+fmtM(evoMonths[i])+': '+v+'€"><div style="font-size:8px;font-weight:700;color:#0b6e55">'+(v||'')+'</div><div class="bar" style="height:'+Math.round(v/maxE*100)+'px;background:#0b6e55"></div></div>';
+    return '<div class="bw" title="'+fmtM(evoMonths[i])+': '+fmtNum(v)+'€"><div style="font-size:8px;font-weight:700;color:#0b6e55">'+(v||'')+'</div><div class="bar" style="height:'+Math.round(v/maxE*100)+'px;background:#0b6e55"></div></div>';
   }).join('');
   ge('g-evlbls').innerHTML=evoMonths.map(function(m){ return '<span>'+m.slice(5)+'</span>'; }).join('');
   var cats={},catsE={},ters={},tersE={},srvs={},srvsE={};
@@ -742,7 +745,7 @@ function drawGraf(){
   var top=Object.entries(cmap).sort(function(a,b){ return b[1].n-a[1].n; }).slice(0,10);
   var maxT=top.length?top[0][1].n:1;
   ge('g-top').innerHTML=top.map(function(e,i){
-    return '<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span>'+e[0]+'</span><span style="font-weight:700">'+e[1].n+' · '+e[1].e+'€</span></div>'
+    return '<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span>'+e[0]+'</span><span style="font-weight:700">'+e[1].n+' · '+fmtNum(e[1].e)+'€</span></div>'
       +'<div class="pb"><div class="pf" style="width:'+Math.round(e[1].n/maxT*100)+'%;background:'+COLORS[i%COLORS.length]+'"></div></div></div>';
   }).join('');
 }
@@ -755,10 +758,10 @@ function showDetById(id){
   var totalG=cs.filter(function(s){ return s.preu>0; }).reduce(function(a,s){ return a+s.preu; },0);
   ge('det-av').textContent=ini(c.nom);
   ge('det-nom').textContent=c.nom;
-  ge('det-sub').innerHTML=String(c.servei_habitual||'')+' · '+cs.length+' sessions · '+totalG+'€'+(c.codi?' <span class="ctag">'+c.codi+'</span>':'');
+  ge('det-sub').innerHTML=String(c.servei_habitual||'')+' · '+cs.length+' sessions · '+fmtNum(totalG)+'€'+(c.codi?' <span class="ctag">'+c.codi+'</span>':'');
   ge('det-body').innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1rem">'
     +'<div class="met"><div class="mv" style="font-size:18px">'+cs.length+'</div><div class="ml">Sessions</div></div>'
-    +'<div class="met"><div class="mv" style="font-size:18px">'+totalG+'€</div><div class="ml">Total</div></div>'
+    +'<div class="met"><div class="mv" style="font-size:18px">'+fmtNum(totalG)+'€</div><div class="ml">Total</div></div>'
     +'<div class="met"><div class="mv" style="font-size:13px">'+fd(c.primera_visita)+'</div><div class="ml">1a visita</div></div></div>'
     +'<div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Historial</div>'
     +'<div class="tl">'+cs.slice(0,25).map(function(s){
