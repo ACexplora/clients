@@ -1167,7 +1167,7 @@ function openEditClient(id) {
   openM('m-ec');
 }
 
-function doEditClient() {
+async function doEditClient() {
   var id = parseInt(ge('ec-id').value);
   var c = null;
   for(var i=0;i<clients.length;i++){ if(clients[i].id===id){ c=clients[i]; break; } }
@@ -1183,7 +1183,19 @@ function doEditClient() {
   var notEl = ge('ec-notes-c'); if(notEl) c.notes = notEl.value.trim();
   c.servei_habitual = gv('ec-srv');
   c.categoria_principal = catOf(c.servei_habitual);
-  if(sbOn) sbUpdate('clients', id, c);
+  // Show saving indicator
+  var btn = document.querySelector('#m-ec .btnp');
+  if(btn) btn.textContent = 'Desant...';
+  if(sbOn && sbUrl && sbKey) {
+    try {
+      await fetch(sbUrl+'/rest/v1/clients?id=eq.'+id, {
+        method:'PATCH',
+        headers:{'Content-Type':'application/json','apikey':sbKey,'Authorization':'Bearer '+sbKey,'Prefer':'return=minimal'},
+        body:JSON.stringify(c)
+      });
+    } catch(e) { console.error('sbUpdate client error', e); }
+  }
+  if(btn) btn.textContent = 'Desar canvis';
   closeM('m-ec');
   drawClients();
 }
