@@ -358,7 +358,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   <input type="hidden" id="es-id">
   <div class="fg">
     <div class="ff"><lbl>Client</lbl><input id="es-cli" readonly style="background:#f7f6f3;color:#888"></div>
-    <div class="ff"><lbl>Servei</lbl><input id="es-srv" readonly style="background:#f7f6f3;color:#888"></div>
+    <div class="ff"><lbl>Servei</lbl><select id="es-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Camino Santiago</option></select></div>
     <div><lbl>Data</lbl><input id="es-data" type="date"></div>
     <div><lbl>Hora</lbl><input id="es-hora" type="time"></div>
     <div><lbl>Preu (&#8364;)</lbl><input id="es-preu" type="number"></div>
@@ -762,6 +762,7 @@ function openEdit(id){
   if(!s) return;
   ge('es-id').value=s.id; ge('es-cli').value=s.client; ge('es-srv').value=s.servei;
   ge('es-data').value=s.data; ge('es-hora').value=s.hora||''; ge('es-preu').value=s.preu||0; ge('es-notes').value=s.notes||'';
+  var srvEl=ge('es-srv'); if(srvEl) srvEl.value=s.servei||'Tantra Energy';
   ge('es-pay').value=['Cash','Bizum','Credit Card','Transferència'].indexOf(s.pagament)>=0?s.pagament:'Cash';
   ge('es-est').value=['Completat','Programat','Cancel·lat','No presentat'].indexOf(s.estat)>=0?s.estat:'Completat';
   ge('es-ter').value=['Carles','Angela','Angela & Carles','Habitació per Hores'].indexOf(s.terapeuta)>=0?s.terapeuta:'Carles';
@@ -774,6 +775,7 @@ function doEditSession(){
   if(!s) return;
   var oldPreu=s.preu;
   s.data=gv('es-data'); s.hora=gv('es-hora'); s.preu=parseInt(gv('es-preu')||0)||0;
+  s.servei=gv('es-srv'); s.categoria=catOf(s.servei);
   s.pagament=gv('es-pay'); s.estat=gv('es-est'); s.terapeuta=gv('es-ter'); s.notes=gv('es-notes');
   for(var i=0;i<clients.length;i++){ if(clients[i].nom===s.client){ clients[i].total_gastat=clients[i].total_gastat-oldPreu+s.preu; break; } }
   if(sbOn) sbUpdate('sessions',id,s);
