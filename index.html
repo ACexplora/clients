@@ -763,6 +763,10 @@ function showDetById(id){
     +'<div class="met"><div class="mv" style="font-size:18px">'+cs.length+'</div><div class="ml">Sessions</div></div>'
     +'<div class="met"><div class="mv" style="font-size:18px">'+fmtNum(totalG)+'€</div><div class="ml">Total</div></div>'
     +'<div class="met"><div class="mv" style="font-size:13px">'+fd(c.primera_visita)+'</div><div class="ml">1a visita</div></div></div>'
+    +(c.telefon||c.poblacio?'<div style="background:#f7f6f3;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:13px;display:flex;gap:1rem;flex-wrap:wrap">'
+    +(c.telefon?'<div><span style="color:#aaa;font-size:11px;font-weight:700;text-transform:uppercase">Tel&egrave;fon</span><br><a href="tel:'+c.telefon+'" style="color:#0b6e55;font-weight:600">'+c.telefon+'</a></div>':'')
+    +(c.poblacio?'<div><span style="color:#aaa;font-size:11px;font-weight:700;text-transform:uppercase">Poblaci&oacute;</span><br><span style="font-weight:600">'+c.poblacio+'</span></div>':'')
+    +'</div>':'')
     +'<div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Historial</div>'
     +'<div class="tl">'+cs.slice(0,25).map(function(s){
       return '<div class="ti"><div class="tdot"></div><div class="tc"><div style="font-size:13px;font-weight:600">'+s.servei+'</div>'
@@ -1164,6 +1168,7 @@ function openEditClient(id) {
   var pobEl = ge('ec-pob'); if(pobEl) pobEl.value = c.poblacio || '';
   var notEl = ge('ec-notes-c'); if(notEl) notEl.value = c.notes || '';
   var srvEl = ge('ec-srv'); if(srvEl) srvEl.value = c.servei_habitual || 'Tantra Energy';
+  c._oldNom = c.nom; // remember old name for session update
   openM('m-ec');
 }
 
@@ -1186,6 +1191,25 @@ async function doEditClient() {
   // Show saving indicator
   var btn = document.querySelector('#m-ec .btnp');
   if(btn) btn.textContent = 'Desant...';
+  // Update sessions with old client name -> new name
+  var oldNom = null;
+  for(var i=0;i<clients.length;i++){ if(clients[i].id===id){ oldNom=clients[i]._oldNom; break; } }
+  if(oldNom && oldNom !== c.nom) {
+    for(var i=0;i<sessions.length;i++){
+      if(sessions[i].client === oldNom) {
+        sessions[i].client = c.nom;
+        sessions[i].codi = c.codi;
+        sessions[i].client_base = c.base;
+        if(sbOn && sbUrl && sbKey) {
+          fetch(sbUrl+'/rest/v1/sessions?id=eq.'+sessions[i].id, {
+            method:'PATCH',
+            headers:{'Content-Type':'application/json','apikey':sbKey,'Authorization':'Bearer '+sbKey,'Prefer':'return=minimal'},
+            body:JSON.stringify({client:c.nom,codi:c.codi,client_base:c.base})
+          }).catch(function(e){ console.error(e); });
+        }
+      }
+    }
+  }
   if(sbOn && sbUrl && sbKey) {
     try {
       await fetch(sbUrl+'/rest/v1/clients?id=eq.'+id, {
@@ -1198,6 +1222,7 @@ async function doEditClient() {
   if(btn) btn.textContent = 'Desar canvis';
   closeM('m-ec');
   drawClients();
+  drawSessions();
 }
 
 </script>
