@@ -1151,6 +1151,43 @@ function drawCalSetmana() {
   ge('cal-body').innerHTML = h;
 }
 
+
+function openEditClient(id) {
+  var c = null;
+  for(var i=0;i<clients.length;i++){ if(clients[i].id===id){ c=clients[i]; break; } }
+  if(!c) return;
+  ge('ec-id').value = c.id;
+  var nomBase = c.base || String(c.nom||'').replace(/\s*\d{4}$/, '').trim();
+  ge('ec-nom').value = nomBase;
+  ge('ec-codi').value = c.codi || '';
+  ge('ec-tel').value = c.telefon || '';
+  var pobEl = ge('ec-pob'); if(pobEl) pobEl.value = c.poblacio || '';
+  var notEl = ge('ec-notes-c'); if(notEl) notEl.value = c.notes || '';
+  var srvEl = ge('ec-srv'); if(srvEl) srvEl.value = c.servei_habitual || 'Tantra Energy';
+  openM('m-ec');
+}
+
+function doEditClient() {
+  var id = parseInt(ge('ec-id').value);
+  var c = null;
+  for(var i=0;i<clients.length;i++){ if(clients[i].id===id){ c=clients[i]; break; } }
+  if(!c) return;
+  var nom  = (gv('ec-nom')||'').trim();
+  var codi = (gv('ec-codi')||'').trim();
+  if(!nom) return;
+  c.base    = nom;
+  c.codi    = codi;
+  c.nom     = codi ? nom + ' ' + codi : nom;
+  c.telefon = (gv('ec-tel')||'').trim();
+  var pobEl = ge('ec-pob'); if(pobEl) c.poblacio = pobEl.value.trim();
+  var notEl = ge('ec-notes-c'); if(notEl) c.notes = notEl.value.trim();
+  c.servei_habitual = gv('ec-srv');
+  c.categoria_principal = catOf(c.servei_habitual);
+  if(sbOn) sbUpdate('clients', id, c);
+  closeM('m-ec');
+  drawClients();
+}
+
 </script>
 
 <div class="mo" id="m-ec"><div class="md" style="width:420px">
@@ -1162,7 +1199,7 @@ function drawCalSetmana() {
     <div><lbl>Tel&#232;fon</lbl><input id="ec-tel" placeholder="+34 6xx xxx xxx" type="tel"></div>
     <div><lbl>Poblaci&#243;</lbl><input id="ec-pob" placeholder="Girona, Barcelona..."></div>
     <div class="ff"><lbl>Servei habitual</lbl><select id="ec-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option></select></div>
-    <div class="ff"><lbl>Notes</lbl><textarea id="ec-notes" rows="2"></textarea></div>
+    <div class="ff"><lbl>Notes</lbl><textarea id="ec-notes-c" rows="2"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
     <button class="btn btns" onclick="closeM('m-ec')">Cancel&#183;lar</button>
