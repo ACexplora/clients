@@ -252,8 +252,8 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div class="fg2"><div class="flbl">Any</div><select id="gf-any" class="fs" onchange="drawGraf()"><option value="">Tots</option></select></div>
     <div class="fg2"><div class="flbl">Mes</div><select id="gf-mes" class="fs" onchange="drawGraf()"><option value="">Tots</option><option value="01">Gen</option><option value="02">Feb</option><option value="03">Mar</option><option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option><option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Des</option></select></div>
     <div class="fg2"><div class="flbl">Terapeuta</div><select id="gf-ter" class="fs" onchange="drawGraf()"><option value="">Tots</option><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option></select></div>
-    <div class="fg2 mh-col"><div class="flbl">Categoria</div><select id="gf-cat" class="fs" onchange="drawGraf()"><option value="">Totes</option><option>Massatge</option><option>Habitaci&#243; per hores</option></select></div>
-    <div class="fg2 mh-col"><div class="flbl">Servei</div><select id="gf-srv" class="fs" onchange="drawGraf()"><option value="">Tots</option></select></div>
+    <div class="fg2"><div class="flbl">Categoria</div><select id="gf-cat" class="fs" onchange="drawGraf()"><option value="">Totes</option><option>Massatge</option><option>Habitaci&#243; per hores</option></select></div>
+    <div class="fg2"><div class="flbl">Servei</div><select id="gf-srv" class="fs" onchange="drawGraf()"><option value="">Tots</option></select></div>
   </div>
   <div class="mets" id="g-met"></div>
   <div class="g2"><div class="card" id="g-act"></div><div class="card" id="g-prev"></div></div>
@@ -267,25 +267,25 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 </div>
 
 <div class="page" id="page-calendari">
-  <div class="cal-header">
-    <div class="cal-nav">
-      <button class="btn btns" onclick="calPrev()">&#8592;</button>
-      <div class="cal-title" id="cal-title"></div>
-      <button class="btn btns" onclick="calNext()">&#8594;</button>
-      <button class="btn btns" onclick="calToday()">Avui</button>
-    </div>
-    <div class="cal-views">
-      <button class="cal-view-btn on" id="btn-mes" onclick="setCalView('mes')">Mes</button>
-      <button class="cal-view-btn" id="btn-setmana" onclick="setCalView('setmana')">Setmana</button>
-    </div>
+  <div class="ph">
+    <div class="pt">Agenda</div>
+    <button class="btn btnp btns" onclick="openM('m-nr')">+ Nova cita</button>
   </div>
-  <div class="card" style="padding:.75rem;overflow-x:auto" id="cal-body"></div>
+  <div class="card" id="r-list"></div>
   <div style="margin-top:1.5rem">
-    <div class="ph" style="margin-bottom:.75rem">
-      <div class="pt" style="font-size:16px">Cites i recordatoris</div>
-      <button class="btn btnp btns" onclick="openM('m-nr')">+ Nova cita</button>
+    <div class="cal-header">
+      <div class="cal-nav">
+        <button class="btn btns" onclick="calPrev()">&#8592;</button>
+        <div class="cal-title" id="cal-title"></div>
+        <button class="btn btns" onclick="calNext()">&#8594;</button>
+        <button class="btn btns" onclick="calToday()">Avui</button>
+      </div>
+      <div class="cal-views">
+        <button class="cal-view-btn on" id="btn-mes" onclick="setCalView('mes')">Mes</button>
+        <button class="cal-view-btn" id="btn-setmana" onclick="setCalView('setmana')">Setmana</button>
+      </div>
     </div>
-    <div class="card" id="r-list"></div>
+    <div class="card" style="padding:.75rem;overflow-x:auto" id="cal-body"></div>
   </div>
 </div>
 
