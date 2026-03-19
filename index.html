@@ -508,7 +508,26 @@ function filtG(){
   return list;
 }
 
+function recalcTotals(){
+  // Recalculate client totals from sessions (only Completat)
+  var totals={}, counts={};
+  for(var i=0;i<sessions.length;i++){
+    var s=sessions[i];
+    if(!counts[s.client]) counts[s.client]=0;
+    counts[s.client]++;
+    if(s.estat==='Completat' && s.preu>0){
+      if(!totals[s.client]) totals[s.client]=0;
+      totals[s.client]+=s.preu;
+    }
+  }
+  for(var i=0;i<clients.length;i++){
+    var nom=clients[i].nom;
+    if(totals[nom]!==undefined) clients[i].total_gastat=totals[nom];
+  }
+}
+
 function drawClients(){
+  recalcTotals();
   var list=filtC(), pages=Math.ceil(list.length/PAGE)||1;
   if(cPage>pages) cPage=1;
   var sl=list.slice((cPage-1)*PAGE,cPage*PAGE);
@@ -798,7 +817,17 @@ function doEditSession(){
   s.data=gv('es-data'); s.hora=gv('es-hora'); s.preu=parseInt(gv('es-preu')||0)||0;
   s.servei=gv('es-srv'); s.categoria=catOf(s.servei);
   s.pagament=gv('es-pay'); s.estat=gv('es-est'); s.terapeuta=gv('es-ter'); s.notes=gv('es-notes');
-  for(var i=0;i<clients.length;i++){ if(clients[i].nom===s.client){ clients[i].total_gastat=clients[i].total_gastat-oldPreu+s.preu; break; } }
+  // Recalculate client total from all completed sessions
+  for(var i=0;i<clients.length;i++){
+    if(clients[i].nom===s.client){
+      var total=0;
+      for(var j=0;j<sessions.length;j++){
+        if(sessions[j].client===s.client && sessions[j].estat==='Completat') total+=sessions[j].preu||0;
+      }
+      clients[i].total_gastat=total;
+      break;
+    }
+  }
   if(sbOn) sbUpdate('sessions',id,s);
   closeM('m-es'); drawSessions(); drawReminders(); drawClients();
 }
@@ -849,7 +878,7 @@ function doAddSession(){
   var s={id:nextSid++,data:gv('nsdata'),hora:gv('nshora'),servei:servei,categoria:catOf(servei),preu:preu,client:client,
     codi:cobj?cobj.codi:'',client_base:cobj?cobj.base:client,terapeuta:gv('nster'),notes:gv('nsnotes'),estat:gv('nsest'),pagament:gv('nspay')};
   sessions.unshift(s);
-  if(cobj){ cobj.sessions++; cobj.total_gastat+=preu; cobj.ultima_visita=s.data; }
+  if(cobj){ cobj.sessions++; if(s.estat==='Completat') cobj.total_gastat+=preu; cobj.ultima_visita=s.data; }
   if(sbOn) sbInsert('sessions',s);
   sPage=1; drawSessions(); drawClients(); closeM('m-ns');
 }
