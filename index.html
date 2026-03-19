@@ -271,22 +271,22 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div class="pt">Agenda</div>
     <button class="btn btnp btns" onclick="openM('m-nr')">+ Nova cita</button>
   </div>
-  <div class="card" id="r-list"></div>
-  <div style="margin-top:1.5rem">
-    <div class="cal-header">
-      <div class="cal-nav">
-        <button class="btn btns" onclick="calPrev()">&#8592;</button>
-        <div class="cal-title" id="cal-title"></div>
-        <button class="btn btns" onclick="calNext()">&#8594;</button>
-        <button class="btn btns" onclick="calToday()">Avui</button>
-      </div>
-      <div class="cal-views">
-        <button class="cal-view-btn on" id="btn-mes" onclick="setCalView('mes')">Mes</button>
-        <button class="cal-view-btn" id="btn-setmana" onclick="setCalView('setmana')">Setmana</button>
-      </div>
+  <!-- CITES I RECORDATORIS PRIMER -->
+  <div class="card" id="r-list" style="margin-bottom:1.5rem"></div>
+  <!-- CALENDARI A SOTA -->
+  <div class="cal-header">
+    <div class="cal-nav">
+      <button class="btn btns" onclick="calPrev()">&#8592;</button>
+      <div class="cal-title" id="cal-title"></div>
+      <button class="btn btns" onclick="calNext()">&#8594;</button>
+      <button class="btn btns" onclick="calToday()">Avui</button>
     </div>
-    <div class="card" style="padding:.75rem;overflow-x:auto" id="cal-body"></div>
+    <div class="cal-views">
+      <button class="cal-view-btn on" id="btn-mes" onclick="setCalView('mes')">Mes</button>
+      <button class="cal-view-btn" id="btn-setmana" onclick="setCalView('setmana')">Setmana</button>
+    </div>
   </div>
+  <div class="card" style="padding:.75rem;overflow-x:auto" id="cal-body"></div>
 </div>
 
 </div>
@@ -791,7 +791,7 @@ function goTo(page,sideEl,mobEl){
   if(page==='pagaments') drawPagaments();
   if(page==='recordatoris') drawReminders();
   if(page==='grafiques') drawGraf();
-  if(page==='calendari'){ drawCal(); drawReminders(); }
+  if(page==='calendari'){ drawReminders(); drawCal(); }
 }
 
 function openM(id){
