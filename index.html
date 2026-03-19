@@ -173,9 +173,8 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   <div class="nav on" onclick="goTo('clients',this)">&#128101; Clients</div>
   <div class="nav" onclick="goTo('sessions',this)">&#128197; Sessions</div>
   <div class="nav" onclick="goTo('pagaments',this)">&#128179; Pagaments</div>
-  <div class="nav" onclick="goTo('recordatoris',this)">&#9200;&#65039; Recordatoris</div>
   <div class="nav" onclick="goTo('grafiques',this)">&#128200; Gr&#224;fiques</div>
-  <div class="nav" onclick="goTo('calendari',this)">&#128197; Calendari</div>
+  <div class="nav" onclick="goTo('calendari',this)">&#128197; Agenda</div>
   <div class="sb-area">
     <div id="dbst" class="dbst dboff">&#9679; Mode local</div>
     <button class="btn btns" style="width:100%;font-size:10px" onclick="openM('m-sb')">&#9881; Supabase</button>
@@ -245,10 +244,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   </div>
 </div>
 
-<div class="page" id="page-recordatoris">
-  <div class="ph"><div class="pt">Cites i recordatoris</div><button class="btn btnp btns" onclick="openM('m-nr')">+ Nova cita</button></div>
-  <div class="card" id="r-list"></div>
-</div>
+<!-- page-recordatoris removed, merged into calendari -->
 
 <div class="page" id="page-grafiques">
   <div class="ph"><div class="pt">Gr&#224;fiques</div></div>
@@ -284,10 +280,13 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     </div>
   </div>
   <div class="card" style="padding:.75rem;overflow-x:auto" id="cal-body"></div>
-</div>
-<div id="cal-popup" class="cal-popup" style="display:none">
-  <button class="cal-popup-close" onclick="closeCalPopup()">&#215;</button>
-  <div id="cal-popup-body"></div>
+  <div style="margin-top:1.5rem">
+    <div class="ph" style="margin-bottom:.75rem">
+      <div class="pt" style="font-size:16px">Cites i recordatoris</div>
+      <button class="btn btnp btns" onclick="openM('m-nr')">+ Nova cita</button>
+    </div>
+    <div class="card" id="r-list"></div>
+  </div>
 </div>
 
 </div>
@@ -300,7 +299,6 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div class="bni on" id="bni-clients" onclick="goTo('clients',null,this)"><div class="bni-ic">&#128101;</div>Clients</div>
     <div class="bni" id="bni-sessions" onclick="goTo('sessions',null,this)"><div class="bni-ic">&#128197;</div>Sessions</div>
     <div class="bni" id="bni-pagaments" onclick="goTo('pagaments',null,this)"><div class="bni-ic">&#128179;</div>Pagaments</div>
-    <div class="bni" id="bni-recordatoris" onclick="goTo('recordatoris',null,this)"><div class="bni-ic">&#9200;</div>Cites</div>
     <div class="bni" id="bni-grafiques" onclick="goTo('grafiques',null,this)"><div class="bni-ic">&#128200;</div>Graf.</div>
     <div class="bni" id="bni-calendari" onclick="goTo('calendari',null,this)"><div class="bni-ic">&#128197;</div>Agenda</div>
   </div>
@@ -793,7 +791,7 @@ function goTo(page,sideEl,mobEl){
   if(page==='pagaments') drawPagaments();
   if(page==='recordatoris') drawReminders();
   if(page==='grafiques') drawGraf();
-  if(page==='calendari') drawCal();
+  if(page==='calendari'){ drawCal(); drawReminders(); }
 }
 
 function openM(id){
