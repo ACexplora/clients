@@ -164,6 +164,10 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 /* Event popup */
 .cal-popup{position:fixed;background:#fff;border:1px solid #e5e3de;border-radius:10px;padding:1rem;box-shadow:0 8px 30px rgba(0,0,0,.15);z-index:150;min-width:220px;max-width:280px}
 .cal-popup-close{float:right;background:none;border:none;font-size:18px;color:#aaa;cursor:pointer;line-height:1}
+
+.cli-opt{padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f5f4f0}
+.cli-opt:hover{background:#eef8f5;color:#0b6e55}
+.cli-opt:last-child{border-bottom:none}
 </style>
 </head>
 <body>
@@ -854,8 +858,10 @@ function goTo(page,sideEl,mobEl){
 
 function openM(id){
   if(id==='m-ns'||id==='m-nr'){
-    var sid=id==='m-ns'?'nscli':'nrcli';
-    ge(sid).innerHTML=clients.map(function(c){ return '<option>'+String(c.nom||'').replace(/</g,'&lt;')+'</option>'; }).join('');
+    var searchId = id==='m-ns' ? 'nscli-search' : 'nrcli-search';
+    var valId    = id==='m-ns' ? 'nscli-val'    : 'nrcli-val';
+    var el = ge(searchId); if(el){ el.value=''; }
+    var vEl = ge(valId); if(vEl){ vEl.value=''; }
   }
   if(id==='m-ns'){ var e=ge('nsdata'); if(e) e.value=today(); }
   if(id==='m-nr'){ var e=ge('nrdata'); if(e) e.value=today(); }
@@ -878,7 +884,7 @@ function doAddClient(){
 }
 
 function doAddSession(){
-  var client=gv('nscli'), servei=gv('nssrv'), preu=parseInt(gv('nspreu')||0)||0;
+  var client=gv('nscli-val')||gv('nscli-search'), servei=gv('nssrv'), preu=parseInt(gv('nspreu')||0)||0;
   var cobj=null;
   for(var i=0;i<clients.length;i++){ if(clients[i].nom===client){ cobj=clients[i]; break; } }
   var s={id:nextSid++,data:gv('nsdata'),hora:gv('nshora'),servei:servei,categoria:catOf(servei),preu:preu,client:client,
@@ -890,7 +896,7 @@ function doAddSession(){
 }
 
 function doAddReminder(){
-  var r={id:nextRid++,client:gv('nrcli'),data:gv('nrdata'),hora:gv('nrhora'),descripcio:gv('nrdesc'),prio:gv('nrprio')};
+  var r={id:nextRid++,client:gv('nrcli-val')||gv('nrcli-search'),data:gv('nrdata'),hora:gv('nrhora'),descripcio:gv('nrdesc'),prio:gv('nrprio')};
   reminders.push(r);
   if(sbOn) sbInsert('recordatoris',r);
   drawReminders(); closeM('m-nr');
@@ -1301,6 +1307,56 @@ function doDelSession(id) {
   drawClients();
   drawReminders();
 }
+
+
+function filterClientList(searchId, listId, valId) {
+  var q = (ge(searchId).value||'').toLowerCase().trim();
+  ge(valId).value = ''; // clear selection when typing
+  showClientList(listId, q);
+}
+
+function showClientList(listId, q) {
+  var el = ge(listId);
+  if(!el) return;
+  var list = clients;
+  if(q) list = clients.filter(function(c){
+    return String(c.nom||'').toLowerCase().indexOf(q) >= 0 ||
+           String(c.codi||'').indexOf(q) >= 0;
+  });
+  list = list.slice(0, 50);
+  if(!list.length){ el.style.display='none'; return; }
+  var searchId = listId.replace('-list','-search');
+  var valId    = listId.replace('-list','-val');
+  el.innerHTML = '';
+  list.forEach(function(c){
+    var nom = String(c.nom||'');
+    var div = document.createElement('div');
+    div.className = 'cli-opt';
+    div.innerHTML = nom + (c.codi?'<span style="font-size:10px;color:#aaa"> · '+c.codi+'</span>':'');
+    div.addEventListener('click', function(){
+      ge(searchId).value = nom;
+      ge(valId).value = nom;
+      el.style.display = 'none';
+    });
+    el.appendChild(div);
+  });
+  el.style.display = 'block';
+}
+
+// selectClient now handled inline in showClientList
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  ['nscli-list','nrcli-list'].forEach(function(id){
+    var el = ge(id);
+    if(el && el.style.display !== 'none') {
+      var search = ge(id.replace('-list','-search'));
+      if(search && !search.contains(e.target) && !el.contains(e.target)){
+        el.style.display = 'none';
+      }
+    }
+  });
+});
 
 </script>
 
