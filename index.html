@@ -269,10 +269,10 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 <div class="page" id="page-calendari">
   <div class="ph">
     <div class="pt">Agenda</div>
-    <button class="btn btnp btns" onclick="openM('m-nr')">+ Nova cita</button>
+    <button class="btn btnp btns" onclick="openM('m-nr')">+ Recordatori</button>
   </div>
   <!-- CITES I RECORDATORIS PRIMER -->
-  <div class="card" id="r-list" style="margin-bottom:1.5rem"></div>
+  <div class="card" id="r-list" style="margin-bottom:1.5rem;overflow:visible"></div>
   <!-- CALENDARI A SOTA -->
   <div class="cal-header">
     <div class="cal-nav">
@@ -658,11 +658,14 @@ function drawReminders(){
   if(prog.length){
     html+='<div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em;padding:8px 0 6px">Cites programades</div>';
     html+=prog.map(function(s){
+      var cId='';
+      for(var ci=0;ci<clients.length;ci++){ if(clients[ci].nom===s.client){ cId=clients[ci].id; break; } }
       return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f0ede8">'
         +'<div style="min-width:75px;font-size:11px;color:#999">'+fd(s.data)+'<br>'+(s.hora||'')+'</div>'
         +'<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+String(s.client||'')+'</div>'
         +'<div style="font-size:12px;color:#666">'+String(s.servei||'')+' · '+String(s.terapeuta||'')+'</div></div>'
         +'<span class="badge bb" style="flex-shrink:0">Prog.</span>'
+        +(cId?'<button class="btn btns" style="flex-shrink:0" onclick="showDetById('+cId+')">Client</button>':'')
         +'<button class="btn btns" style="flex-shrink:0" onclick="openEdit('+s.id+')">Editar</button></div>';
     }).join('');
   }
@@ -843,7 +846,7 @@ function goTo(page,sideEl,mobEl){
   if(page==='pagaments') drawPagaments();
   if(page==='recordatoris') drawReminders();
   if(page==='grafiques') drawGraf();
-  if(page==='calendari'){ drawReminders(); drawCal(); }
+  if(page==='calendari'){ drawCal(); drawReminders(); }
 }
 
 function openM(id){
