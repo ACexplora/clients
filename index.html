@@ -367,9 +367,12 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div><lbl>Terapeuta</lbl><select id="es-ter"><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option></select></div>
     <div class="ff"><lbl>Notes</lbl><textarea id="es-notes" rows="2"></textarea></div>
   </div>
-  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
-    <button class="btn btns" onclick="closeM('m-es')">Cancel&#183;lar</button>
-    <button class="btn btnp btns" onclick="doEditSession()">Desar canvis</button>
+  <div style="display:flex;gap:8px;justify-content:space-between;margin-top:1.25rem">
+    <button class="btn btns" style="color:#c0392b" onclick="confirmDelSession()">&#128465; Eliminar</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn btns" onclick="closeM('m-es')">Cancel&#183;lar</button>
+      <button class="btn btnp btns" onclick="doEditSession()">Desar canvis</button>
+    </div>
   </div>
 </div></div>
 
@@ -1269,6 +1272,34 @@ async function doEditClient() {
   closeM('m-ec');
   drawClients();
   drawSessions();
+}
+
+
+function confirmDelSession() {
+  var id = parseInt(ge('es-id').value);
+  var s = null;
+  for(var i=0;i<sessions.length;i++){ if(sessions[i].id===id){ s=sessions[i]; break; } }
+  if(!s) return;
+  if(!confirm('Eliminar la sessio de ' + s.client + ' (' + fd(s.data) + ')? Aquesta accio no es pot desfer.')) return;
+  doDelSession(id);
+}
+
+function doDelSession(id) {
+  var idx = -1;
+  for(var i=0;i<sessions.length;i++){ if(sessions[i].id===id){ idx=i; break; } }
+  if(idx < 0) return;
+  sessions.splice(idx, 1);
+  recalcTotals();
+  if(sbOn && sbUrl && sbKey){
+    fetch(sbUrl+'/rest/v1/sessions?id=eq.'+id, {
+      method:'DELETE',
+      headers:{'apikey':sbKey,'Authorization':'Bearer '+sbKey}
+    }).catch(function(e){ console.error(e); });
+  }
+  closeM('m-es');
+  drawSessions();
+  drawClients();
+  drawReminders();
 }
 
 </script>
