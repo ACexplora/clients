@@ -709,8 +709,12 @@ function progBarsAmt(elId,entries,total,amts){
 
 function mesCard(key,data,label,elId){
   var comp=data.filter(function(s){ return String(s.data).startsWith(key)&&s.estat==='Completat'; });
+  var prog=data.filter(function(s){ return String(s.data).startsWith(key)&&s.estat==='Programat'&&s.preu>0; });
   var all=data.filter(function(s){ return String(s.data).startsWith(key); });
   var ing=comp.reduce(function(a,s){ return a+s.preu; },0);
+  var pendent=prog.reduce(function(a,s){ return a+s.preu; },0);
+  var pendMas=prog.filter(function(s){ return s.categoria==='Massatge'; }).reduce(function(a,s){ return a+s.preu; },0);
+  var pendHab=prog.filter(function(s){ return s.categoria==='Habitació per hores'; }).reduce(function(a,s){ return a+s.preu; },0);
   var cats={},ters={};
   comp.forEach(function(s){ cats[s.categoria]=(cats[s.categoria]||0)+s.preu; });
   all.forEach(function(s){ ters[s.terapeuta]=(ters[s.terapeuta]||0)+1; });
@@ -719,6 +723,14 @@ function mesCard(key,data,label,elId){
   el.innerHTML='<div class="stit">'+label+' <span style="font-size:12px;color:#aaa;font-weight:400">('+fmtM(key)+')</span></div>'
     +'<div class="crow"><span style="color:#888">Ingressos</span><span style="font-weight:700;color:#0b6e55;font-size:16px">'+fmtNum(ing)+'€</span></div>'
     +'<div class="crow"><span style="color:#888">Sessions</span><span style="font-weight:600">'+all.length+'</span></div>'
+    +(pendent>0?
+      '<div style="margin:8px 0 4px;padding:8px 10px;background:#fef9ec;border-left:3px solid #f59e0b;border-radius:0 6px 6px 0">'
+      +'<div style="font-size:10px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Pendent de cobrar</div>'
+      +'<div class="crow" style="border:none;padding:1px 0"><span style="font-size:12px">Total</span><span style="font-weight:700;color:#b45309">'+fmtNum(pendent)+'€</span></div>'
+      +(pendMas>0?'<div class="crow" style="border:none;padding:1px 0"><span style="font-size:12px;color:#888">· Massatge</span><span style="font-size:12px;font-weight:600;color:#b45309">'+fmtNum(pendMas)+'€</span></div>':'')
+      +(pendHab>0?'<div class="crow" style="border:none;padding:1px 0"><span style="font-size:12px;color:#888">· Habitació</span><span style="font-size:12px;font-weight:600;color:#b45309">'+fmtNum(pendHab)+'€</span></div>':'')
+      +'</div>'
+    :'')
     +'<div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em;margin:8px 0 5px">Per categoria</div>'
     +Object.entries(cats).sort(function(a,b){ return b[1]-a[1]; }).map(function(e,i){
       var pct=Math.round(e[1]/catT*100);
