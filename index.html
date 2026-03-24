@@ -147,6 +147,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 .cal-event.angela{background:#9d174d}
 .cal-event.both{background:#b45309}
 .cal-event.hab{background:#1e40af}
+.cal-event.dies{background:#0e7490}
 .cal-event.prog{background:#6b7280;opacity:.8}
 .cal-more{font-size:10px;color:#0b6e55;font-weight:600;cursor:pointer}
 /* Weekly */
@@ -160,6 +161,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 .cal-week-event.angela{background:#9d174d}
 .cal-week-event.both{background:#b45309}
 .cal-week-event.hab{background:#1e40af}
+.cal-week-event.dies{background:#0e7490}
 .cal-week-event.prog{background:#6b7280;opacity:.8}
 /* Event popup */
 .cal-popup{position:fixed;background:#fff;border:1px solid #e5e3de;border-radius:10px;padding:1rem;box-shadow:0 8px 30px rgba(0,0,0,.15);z-index:150;min-width:220px;max-width:280px}
@@ -198,6 +200,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
         <option value="">Totes categories</option>
         <option value="Massatge">Massatge</option>
         <option value="Habitaci&#243; per hores">Habitaci&#243;</option>
+        <option value="Habitaci&#243; per dies">Habitaci&#243; per dies</option>
       </select>
       <button class="btn btnp btns" onclick="openM('m-nc')">+ Nou</button>
     </div>
@@ -219,7 +222,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   <div style="background:#fff;border:1px solid #e5e3de;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem">
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
       <div class="fg2"><div class="flbl">Client/Codi</div><input type="text" id="sf-q" style="width:130px" oninput="sPage=1;drawSessions()"></div>
-      <div class="fg2"><div class="flbl">Terapeuta</div><select id="sf-ter" class="fs" onchange="sPage=1;drawSessions()"><option value="">Tots</option><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option></select></div>
+      <div class="fg2"><div class="flbl">Terapeuta</div><select id="sf-ter" class="fs" onchange="sPage=1;drawSessions()"><option value="">Tots</option><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option><option>Habitaci&#243; per Dies</option></select></div>
       <div class="fg2"><div class="flbl">Estat</div><select id="sf-est" class="fs" onchange="sPage=1;drawSessions()"><option value="">Tots</option><option>Completat</option><option>Cancel&#183;lat</option><option>No presentat</option><option>Programat</option></select></div>
       <div class="fg2"><div class="flbl">Servei</div><select id="sf-srv" class="fs" onchange="sPage=1;drawSessions()"><option value="">Tots</option></select></div>
       <div class="fg2"><div class="flbl">Des de</div><input type="date" id="sf-fr" oninput="sPage=1;drawSessions()"></div>
@@ -314,7 +317,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   <div class="fg">
     <div><lbl>Nom</lbl><input id="cn" placeholder="Nom complet"></div>
     <div><lbl>Codi WhatsApp (4 d&#237;gits)</lbl><input id="cco" placeholder="1234" maxlength="4"></div>
-    <div class="ff"><lbl>Servei habitual</lbl><select id="csrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option></select></div>
+    <div class="ff"><lbl>Servei habitual</lbl><select id="csrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Per dies</option></select></div>
     <div class="ff"><lbl>Notes</lbl><textarea id="cnotes" rows="2"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
@@ -331,7 +334,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div><lbl>Hora</lbl><input id="nshora" type="time" value="10:00"></div>
     <div><lbl>Servei</lbl><select id="nssrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option></select></div>
     <div><lbl>Preu (&#8364;)</lbl><input id="nspreu" type="number" value="80"></div>
-    <div><lbl>Terapeuta</lbl><select id="nster"><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option></select></div>
+    <div><lbl>Terapeuta</lbl><select id="nster"><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option><option>Habitaci&#243; per Dies</option></select></div>
     <div><lbl>Pagament</lbl><select id="nspay"><option>Cash</option><option>Bizum</option><option>Credit Card</option><option>Transfer&#232;ncia</option></select></div>
     <div><lbl>Estat</lbl><select id="nsest"><option>Completat</option><option>Programat</option><option>Cancel&#183;lat</option><option>No presentat</option></select></div>
     <div class="ff"><lbl>Notes</lbl><textarea id="nsnotes" rows="2"></textarea></div>
@@ -368,7 +371,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div><lbl>Preu (&#8364;)</lbl><input id="es-preu" type="number"></div>
     <div><lbl>Pagament</lbl><select id="es-pay"><option>Cash</option><option>Bizum</option><option>Credit Card</option><option>Transfer&#232;ncia</option></select></div>
     <div><lbl>Estat</lbl><select id="es-est"><option>Completat</option><option>Programat</option><option>Cancel&#183;lat</option><option>No presentat</option></select></div>
-    <div><lbl>Terapeuta</lbl><select id="es-ter"><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option></select></div>
+    <div><lbl>Terapeuta</lbl><select id="es-ter"><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option><option>Habitaci&#243; per Dies</option></select></div>
     <div class="ff"><lbl>Notes</lbl><textarea id="es-notes" rows="2"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:space-between;margin-top:1.25rem">
@@ -464,7 +467,12 @@ function isMassatge(s){
   for(var i=0;i<kw.length;i++){ if(String(s).indexOf(kw[i])>=0) return true; }
   return false;
 }
-function catOf(s){ return isMassatge(s)?'Massatge':'Habitació per hores'; }
+function isDies(s){ return String(s).indexOf('Per dies')>=0||String(s).indexOf('per dies')>=0; }
+function catOf(s){
+  if(isDies(s)) return 'Habitació per dies';
+  if(isMassatge(s)) return 'Massatge';
+  return 'Habitació per hores';
+}
 function today(){ return new Date().toISOString().split('T')[0]; }
 function mesKey(off){ var d=new Date(); d.setMonth(d.getMonth()+off); return d.toISOString().slice(0,7); }
 
@@ -715,6 +723,7 @@ function mesCard(key,data,label,elId){
   var pendent=prog.reduce(function(a,s){ return a+s.preu; },0);
   var pendMas=prog.filter(function(s){ return s.categoria==='Massatge'; }).reduce(function(a,s){ return a+s.preu; },0);
   var pendHab=prog.filter(function(s){ return s.categoria==='Habitació per hores'; }).reduce(function(a,s){ return a+s.preu; },0);
+  var pendDies=prog.filter(function(s){ return s.categoria==='Habitació per dies'; }).reduce(function(a,s){ return a+s.preu; },0);
   var cats={},ters={};
   comp.forEach(function(s){ cats[s.categoria]=(cats[s.categoria]||0)+s.preu; });
   all.forEach(function(s){ ters[s.terapeuta]=(ters[s.terapeuta]||0)+1; });
@@ -728,7 +737,8 @@ function mesCard(key,data,label,elId){
       +'<div style="font-size:10px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Pendent de cobrar</div>'
       +'<div class="crow" style="border:none;padding:1px 0"><span style="font-size:12px">Total</span><span style="font-weight:700;color:#b45309">'+fmtNum(pendent)+'€</span></div>'
       +(pendMas>0?'<div class="crow" style="border:none;padding:1px 0"><span style="font-size:12px;color:#888">· Massatge</span><span style="font-size:12px;font-weight:600;color:#b45309">'+fmtNum(pendMas)+'€</span></div>':'')
-      +(pendHab>0?'<div class="crow" style="border:none;padding:1px 0"><span style="font-size:12px;color:#888">· Habitació</span><span style="font-size:12px;font-weight:600;color:#b45309">'+fmtNum(pendHab)+'€</span></div>':'')
+      +(pendHab>0?'<div class="crow" style="border:none;padding:1px 0"><span style="font-size:12px;color:#888">· Habitació hores</span><span style="font-size:12px;font-weight:600;color:#b45309">'+fmtNum(pendHab)+'€</span></div>':'')
+      +(pendDies>0?'<div class="crow" style="border:none;padding:1px 0"><span style="font-size:12px;color:#888">· Habitació dies</span><span style="font-size:12px;font-weight:600;color:#b45309">'+fmtNum(pendDies)+'€</span></div>':'')
       +'</div>'
     :'')
     +'<div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em;margin:8px 0 5px">Per categoria</div>'
@@ -827,7 +837,7 @@ function openEdit(id){
   var srvEl=ge('es-srv'); if(srvEl) srvEl.value=s.servei||'Tantra Energy';
   ge('es-pay').value=['Cash','Bizum','Credit Card','Transferència'].indexOf(s.pagament)>=0?s.pagament:'Cash';
   ge('es-est').value=['Completat','Programat','Cancel·lat','No presentat'].indexOf(s.estat)>=0?s.estat:'Completat';
-  ge('es-ter').value=['Carles','Angela','Angela & Carles','Habitació per Hores'].indexOf(s.terapeuta)>=0?s.terapeuta:'Carles';
+  ge('es-ter').value=['Carles','Angela','Angela & Carles','Habitació per Hores','Habitació per Dies'].indexOf(s.terapeuta)>=0?s.terapeuta:'Carles';
   openM('m-es');
 }
 
@@ -1380,7 +1390,7 @@ document.addEventListener('click', function(e) {
     <div><lbl>Codi WhatsApp (4 d&#237;gits)</lbl><input id="ec-codi" placeholder="1234" maxlength="4" style="font-family:monospace"></div>
     <div><lbl>Tel&#232;fon</lbl><input id="ec-tel" placeholder="+34 6xx xxx xxx" type="tel"></div>
     <div><lbl>Poblaci&#243;</lbl><input id="ec-pob" placeholder="Girona, Barcelona..."></div>
-    <div class="ff"><lbl>Servei habitual</lbl><select id="ec-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option></select></div>
+    <div class="ff"><lbl>Servei habitual</lbl><select id="ec-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Per dies</option></select></div>
     <div class="ff"><lbl>Notes</lbl><textarea id="ec-notes-c" rows="2"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
