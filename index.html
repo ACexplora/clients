@@ -317,7 +317,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   <div class="fg">
     <div><lbl>Nom</lbl><input id="cn" placeholder="Nom complet"></div>
     <div><lbl>Codi WhatsApp (4 d&#237;gits)</lbl><input id="cco" placeholder="1234" maxlength="4"></div>
-    <div class="ff"><lbl>Servei habitual</lbl><select id="csrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Per dies</option></select></div>
+    <div class="ff"><lbl>Servei habitual</lbl><select id="csrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Per dies</option><option>Habitaci&#243; per dies</option></select></div>
     <div class="ff"><lbl>Notes</lbl><textarea id="cnotes" rows="2"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
@@ -332,7 +332,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div class="ff"><lbl>Client</lbl><input type="text" id="nscli-search" placeholder="Cerca client..." autocomplete="off" oninput="filterClientList('nscli-search','nscli-list','nscli-val')" onfocus="filterClientList('nscli-search','nscli-list','nscli-val')"><div id="nscli-list" style="display:none;border:1px solid #e5e3de;border-radius:6px;max-height:180px;overflow-y:auto;margin-top:2px;background:#fff"></div><input type="hidden" id="nscli-val"></div>
     <div><lbl>Data</lbl><input id="nsdata" type="date"></div>
     <div><lbl>Hora</lbl><input id="nshora" type="time" value="10:00"></div>
-    <div><lbl>Servei</lbl><select id="nssrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option></select></div>
+    <div><lbl>Servei</lbl><select id="nssrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Per dies</option><option>Habitaci&#243; per dies</option><option>Camino Santiago</option></select></div>
     <div><lbl>Preu (&#8364;)</lbl><input id="nspreu" type="number" value="80"></div>
     <div><lbl>Terapeuta</lbl><select id="nster"><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option><option>Habitaci&#243; per Dies</option></select></div>
     <div><lbl>Pagament</lbl><select id="nspay"><option>Cash</option><option>Bizum</option><option>Credit Card</option><option>Transfer&#232;ncia</option></select></div>
@@ -366,7 +366,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   <input type="hidden" id="es-id">
   <div class="fg">
     <div class="ff"><lbl>Client</lbl><input id="es-cli" readonly style="background:#f7f6f3;color:#888"></div>
-    <div class="ff"><lbl>Servei</lbl><select id="es-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Camino Santiago</option></select></div>
+    <div class="ff"><lbl>Servei</lbl><select id="es-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Per dies</option><option>Habitaci&#243; per dies</option><option>Camino Santiago</option></select></div>
     <div><lbl>Data</lbl><input id="es-data" type="date"></div>
     <div><lbl>Hora</lbl><input id="es-hora" type="time"></div>
     <div><lbl>Preu (&#8364;)</lbl><input id="es-preu" type="number"></div>
@@ -469,7 +469,7 @@ function isMassatge(s){
   for(var i=0;i<kw.length;i++){ if(String(s).indexOf(kw[i])>=0) return true; }
   return false;
 }
-function isDies(s){ return String(s).indexOf('Per dies')>=0||String(s).indexOf('per dies')>=0; }
+function isDies(s){ var ss=String(s); return ss.indexOf('Per dies')>=0||ss.indexOf('per dies')>=0||ss.indexOf('Habitació per dies')>=0; }
 function catOf(s){
   if(isDies(s)) return 'Habitació per dies';
   if(isMassatge(s)) return 'Massatge';
@@ -1396,7 +1396,7 @@ document.addEventListener('click', function(e) {
     <div><lbl>Codi WhatsApp (4 d&#237;gits)</lbl><input id="ec-codi" placeholder="1234" maxlength="4" style="font-family:monospace"></div>
     <div><lbl>Tel&#232;fon</lbl><input id="ec-tel" placeholder="+34 6xx xxx xxx" type="tel"></div>
     <div><lbl>Poblaci&#243;</lbl><input id="ec-pob" placeholder="Girona, Barcelona..."></div>
-    <div class="ff"><lbl>Servei habitual</lbl><select id="ec-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Per dies</option></select></div>
+    <div class="ff"><lbl>Servei habitual</lbl><select id="ec-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Per dies</option><option>Habitaci&#243; per dies</option></select></div>
     <div class="ff"><lbl>Notes</lbl><textarea id="ec-notes-c" rows="2"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
