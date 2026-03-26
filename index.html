@@ -227,7 +227,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
       <div class="fg2"><div class="flbl">Servei</div><select id="sf-srv" class="fs" onchange="sPage=1;drawSessions()"><option value="">Tots</option></select></div>
       <div class="fg2"><div class="flbl">Des de</div><input type="date" id="sf-fr" oninput="sPage=1;drawSessions()"></div>
       <div class="fg2"><div class="flbl">Fins a</div><input type="date" id="sf-to" oninput="sPage=1;drawSessions()"></div>
-      <div class="fg2"><div class="flbl">Categoria</div><select id="sf-cat" class="fs" onchange="sPage=1;drawSessions()"><option value="">Totes</option><option>Massatge</option><option>Habitaci&#243; per hores</option></select></div>
+      <div class="fg2"><div class="flbl">Categoria</div><select id="sf-cat" class="fs" onchange="sPage=1;drawSessions()"><option value="">Totes</option><option>Massatge</option><option>Habitaci&#243; per hores</option><option>Habitaci&#243; per dies</option></select></div>
       <button class="btn btns" style="align-self:flex-end;white-space:nowrap" onclick="clearSF()">Netejar</button>
     </div>
   </div>
@@ -259,7 +259,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div class="fg2"><div class="flbl">Any</div><select id="gf-any" class="fs" onchange="drawGraf()"><option value="">Tots</option></select></div>
     <div class="fg2"><div class="flbl">Mes</div><select id="gf-mes" class="fs" onchange="drawGraf()"><option value="">Tots</option><option value="01">Gen</option><option value="02">Feb</option><option value="03">Mar</option><option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option><option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Des</option></select></div>
     <div class="fg2"><div class="flbl">Terapeuta</div><select id="gf-ter" class="fs" onchange="drawGraf()"><option value="">Tots</option><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option></select></div>
-    <div class="fg2"><div class="flbl">Categoria</div><select id="gf-cat" class="fs" onchange="drawGraf()"><option value="">Totes</option><option>Massatge</option><option>Habitaci&#243; per hores</option></select></div>
+    <div class="fg2"><div class="flbl">Categoria</div><select id="gf-cat" class="fs" onchange="drawGraf()"><option value="">Totes</option><option>Massatge</option><option>Habitaci&#243; per hores</option><option>Habitaci&#243; per dies</option></select></div>
     <div class="fg2"><div class="flbl">Servei</div><select id="gf-srv" class="fs" onchange="drawGraf()"><option value="">Tots</option></select></div>
   </div>
   <div class="mets" id="g-met"></div>
@@ -337,6 +337,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div><lbl>Terapeuta</lbl><select id="nster"><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option><option>Habitaci&#243; per Dies</option></select></div>
     <div><lbl>Pagament</lbl><select id="nspay"><option>Cash</option><option>Bizum</option><option>Credit Card</option><option>Transfer&#232;ncia</option></select></div>
     <div><lbl>Estat</lbl><select id="nsest"><option>Completat</option><option>Programat</option><option>Cancel&#183;lat</option><option>No presentat</option></select></div>
+    <div><lbl>Pagat a compte (&#8364;)</lbl><input id="nscompte" type="number" min="0" placeholder="0"></div>
     <div class="ff"><lbl>Notes</lbl><textarea id="nsnotes" rows="2"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
@@ -372,6 +373,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div><lbl>Pagament</lbl><select id="es-pay"><option>Cash</option><option>Bizum</option><option>Credit Card</option><option>Transfer&#232;ncia</option></select></div>
     <div><lbl>Estat</lbl><select id="es-est"><option>Completat</option><option>Programat</option><option>Cancel&#183;lat</option><option>No presentat</option></select></div>
     <div><lbl>Terapeuta</lbl><select id="es-ter"><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option><option>Habitaci&#243; per Dies</option></select></div>
+    <div><lbl>Pagat a compte (&#8364;)</lbl><input id="es-compte" type="number" min="0" placeholder="0"></div>
     <div class="ff"><lbl>Notes</lbl><textarea id="es-notes" rows="2"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:space-between;margin-top:1.25rem">
@@ -612,7 +614,7 @@ function drawSessions(){
       +'<td><div class="row"><div class="av">'+ini(s.client)+'</div><span style="font-size:12px;overflow:hidden;text-overflow:ellipsis;max-width:130px;display:inline-block">'+String(s.client||'')+'</span></div></td>'
       +'<td>'+(s.codi?'<span class="ctag">'+s.codi+'</span>':'—')+'</td>'
       +'<td style="font-size:11px">'+String(s.servei||'')+'</td>'
-      +'<td style="font-weight:700;color:#0b6e55;white-space:nowrap">'+(s.preu>0?s.preu+'€':'—')+'</td>'
+      +'<td style="font-weight:700;color:#0b6e55;white-space:nowrap">'+(s.preu>0?fmtNum(s.preu)+'€':'—')+(s.preu_compte>0?'<br><span style="font-size:9px;color:#b45309;font-weight:600">↳'+fmtNum(s.preu_compte)+'€ compte</span>':'')+'</td>'
       +'<td style="font-size:11px">'+String(s.terapeuta||'')+'</td>'
       +'<td>'+estatB(s.estat)+'</td>'
       +'<td><button class="btn btns" onclick="openEdit('+s.id+')">Editar</button></td>'
@@ -720,7 +722,8 @@ function mesCard(key,data,label,elId){
   var prog=data.filter(function(s){ return String(s.data).startsWith(key)&&s.estat==='Programat'&&s.preu>0; });
   var all=data.filter(function(s){ return String(s.data).startsWith(key); });
   var ing=comp.reduce(function(a,s){ return a+s.preu; },0);
-  var pendent=prog.reduce(function(a,s){ return a+s.preu; },0);
+  var pendent=prog.reduce(function(a,s){ return a+(s.preu-(s.preu_compte||0)); },0);
+  var pendentBrut=prog.reduce(function(a,s){ return a+s.preu; },0);
   var pendMas=prog.filter(function(s){ return s.categoria==='Massatge'; }).reduce(function(a,s){ return a+s.preu; },0);
   var pendHab=prog.filter(function(s){ return s.categoria==='Habitació per hores'; }).reduce(function(a,s){ return a+s.preu; },0);
   var pendDies=prog.filter(function(s){ return s.categoria==='Habitació per dies'; }).reduce(function(a,s){ return a+s.preu; },0);
@@ -836,6 +839,7 @@ function openEdit(id){
   ge('es-data').value=s.data; ge('es-hora').value=s.hora||''; ge('es-preu').value=s.preu||0; ge('es-notes').value=s.notes||'';
   var srvEl=ge('es-srv'); if(srvEl) srvEl.value=s.servei||'Tantra Energy';
   ge('es-pay').value=['Cash','Bizum','Credit Card','Transferència'].indexOf(s.pagament)>=0?s.pagament:'Cash';
+  var compEl=ge('es-compte'); if(compEl) compEl.value=s.preu_compte||0;
   ge('es-est').value=['Completat','Programat','Cancel·lat','No presentat'].indexOf(s.estat)>=0?s.estat:'Completat';
   ge('es-ter').value=['Carles','Angela','Angela & Carles','Habitació per Hores','Habitació per Dies'].indexOf(s.terapeuta)>=0?s.terapeuta:'Carles';
   openM('m-es');
@@ -848,6 +852,7 @@ function doEditSession(){
   var oldPreu=s.preu;
   s.data=gv('es-data'); s.hora=gv('es-hora'); s.preu=parseInt(gv('es-preu')||0)||0;
   s.servei=gv('es-srv'); s.categoria=catOf(s.servei);
+  s.preu_compte=parseInt((ge('es-compte')?ge('es-compte').value:0)||0)||0;
   s.pagament=gv('es-pay'); s.estat=gv('es-est'); s.terapeuta=gv('es-ter'); s.notes=gv('es-notes');
   // Recalculate client total from all completed sessions
   for(var i=0;i<clients.length;i++){
@@ -909,7 +914,8 @@ function doAddSession(){
   var client=gv('nscli-val')||gv('nscli-search'), servei=gv('nssrv'), preu=parseInt(gv('nspreu')||0)||0;
   var cobj=null;
   for(var i=0;i<clients.length;i++){ if(clients[i].nom===client){ cobj=clients[i]; break; } }
-  var s={id:nextSid++,data:gv('nsdata'),hora:gv('nshora'),servei:servei,categoria:catOf(servei),preu:preu,client:client,
+  var compte=parseInt((ge('nscompte')?ge('nscompte').value:0)||0)||0;
+  var s={id:nextSid++,data:gv('nsdata'),hora:gv('nshora'),servei:servei,categoria:catOf(servei),preu:preu,preu_compte:compte,client:client,
     codi:cobj?cobj.codi:'',client_base:cobj?cobj.base:client,terapeuta:gv('nster'),notes:gv('nsnotes'),estat:gv('nsest'),pagament:gv('nspay')};
   sessions.unshift(s);
   if(cobj){ cobj.sessions++; if(s.estat==='Completat') cobj.total_gastat+=preu; cobj.ultima_visita=s.data; }
