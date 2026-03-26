@@ -177,10 +177,11 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 <div class="side">
   <div class="logo">Angela &amp; Carles<small>Massatge Girona</small></div>
   <div class="nav on" onclick="goTo('clients',this)">&#128101; Clients</div>
-  <div class="nav" onclick="goTo('sessions',this)">&#128197; Sessions</div>
+  <div class="nav" onclick="goTo('sessions',this)">&#128197; Cites</div>
   <div class="nav" onclick="goTo('pagaments',this)">&#128179; Pagaments</div>
   <div class="nav" onclick="goTo('grafiques',this)">&#128200; Gr&#224;fiques</div>
   <div class="nav" onclick="goTo('calendari',this)">&#128197; Agenda</div>
+  <div class="nav" onclick="goTo('despeses',this)">&#128176; Despeses</div>
   <div class="sb-area">
     <div id="dbst" class="dbst dboff">&#9679; Mode local</div>
     <button class="btn btns" style="width:100%;font-size:10px" onclick="openM('m-sb')">&#9881; Supabase</button>
@@ -216,7 +217,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 
 <div class="page" id="page-sessions">
   <div class="ph">
-    <div class="pt">Sessions <span id="s-cnt" style="font-size:13px;color:#999;font-weight:400"></span></div>
+    <div class="pt">Cites <span id="s-cnt" style="font-size:13px;color:#999;font-weight:400"></span></div>
     <button class="btn btnp btns" onclick="openM('m-ns')">+ Nova</button>
   </div>
   <div style="background:#fff;border:1px solid #e5e3de;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem">
@@ -300,13 +301,90 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 
 </div></div>
 
+<div class="page" id="page-despeses">
+  <div class="ph">
+    <div class="pt">Despeses</div>
+    <button class="btn btnp btns" onclick="openM('m-nd')">+ Nova despesa</button>
+  </div>
+  <div class="mets" id="d-met"></div>
+  <div class="fbar">
+    <div class="fg2"><div class="flbl">Categoria</div>
+      <select id="df-cat" class="fs" onchange="drawDespeses()">
+        <option value="">Totes</option>
+        <option>Subministraments</option>
+        <option>Equipament</option>
+        <option>Marketing</option>
+        <option>Altres despeses</option>
+      </select>
+    </div>
+    <div class="fg2"><div class="flbl">Producte</div><select id="df-prod" class="fs" onchange="drawDespeses()"><option value="">Tots</option></select></div>
+    <div class="fg2"><div class="flbl">Des de</div><input type="date" id="df-fr" oninput="drawDespeses()"></div>
+    <div class="fg2"><div class="flbl">Fins a</div><input type="date" id="df-to" oninput="drawDespeses()"></div>
+    <button class="btn btns" onclick="clearDF()">Netejar</button>
+  </div>
+  <div class="card" style="padding:0;overflow-x:auto">
+    <table><thead><tr><th>Data</th><th>Categoria</th><th>Producte</th><th>Import</th><th>Notes</th><th></th></tr></thead>
+    <tbody id="d-tb"></tbody></table>
+  </div>
+  <div id="d-pg" class="pager"></div>
+</div>
+
+<div class="mo" id="m-nd"><div class="md" style="width:440px">
+  <div class="mh"><div class="mtt">Nova despesa</div><button class="xb" onclick="closeM('m-nd')">&#215;</button></div>
+  <div class="fg">
+    <div><lbl>Data</lbl><input id="nd-data" type="date"></div>
+    <div><lbl>Import (&#8364;)</lbl><input id="nd-preu" type="number" min="0" placeholder="0"></div>
+    <div><lbl>Categoria</lbl>
+      <select id="nd-cat" onchange="updateProdSelect()">
+        <option>Subministraments</option>
+        <option>Equipament</option>
+        <option>Marketing</option>
+        <option>Altres despeses</option>
+      </select>
+    </div>
+    <div><lbl>Producte</lbl><select id="nd-prod"></select></div>
+    <div class="ff"><lbl>Notes</lbl><input id="nd-notes" placeholder="Descripci&#243;..."></div>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
+    <button class="btn btns" onclick="closeM('m-nd')">Cancel&#183;lar</button>
+    <button class="btn btnp btns" onclick="doAddDespesa()">Desar</button>
+  </div>
+</div></div>
+
+<div class="mo" id="m-ed"><div class="md" style="width:440px">
+  <div class="mh"><div class="mtt">Editar despesa</div><button class="xb" onclick="closeM('m-ed')">&#215;</button></div>
+  <input type="hidden" id="ed-id">
+  <div class="fg">
+    <div><lbl>Data</lbl><input id="ed-data" type="date"></div>
+    <div><lbl>Import (&#8364;)</lbl><input id="ed-preu" type="number" min="0"></div>
+    <div><lbl>Categoria</lbl>
+      <select id="ed-cat" onchange="updateProdSelectEdit()">
+        <option>Subministraments</option>
+        <option>Equipament</option>
+        <option>Marketing</option>
+        <option>Altres despeses</option>
+      </select>
+    </div>
+    <div><lbl>Producte</lbl><select id="ed-prod"></select></div>
+    <div class="ff"><lbl>Notes</lbl><input id="ed-notes" placeholder="Descripci&#243;..."></div>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:space-between;margin-top:1.25rem">
+    <button class="btn btns" style="color:#c0392b" onclick="confirmDelDespesa()">&#128465; Eliminar</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn btns" onclick="closeM('m-ed')">Cancel&#183;lar</button>
+      <button class="btn btnp btns" onclick="doEditDespesa()">Desar canvis</button>
+    </div>
+  </div>
+</div></div>
+
 <!-- BOTTOM NAV MOBILE -->
 <div class="bnav">
   <div class="bnav-row">
     <div class="bni on" id="bni-clients" onclick="goTo('clients',null,this)"><div class="bni-ic">&#128101;</div>Clients</div>
-    <div class="bni" id="bni-sessions" onclick="goTo('sessions',null,this)"><div class="bni-ic">&#128197;</div>Sessions</div>
+    <div class="bni" id="bni-sessions" onclick="goTo('sessions',null,this)"><div class="bni-ic">&#128197;</div>Cites</div>
     <div class="bni" id="bni-pagaments" onclick="goTo('pagaments',null,this)"><div class="bni-ic">&#128179;</div>Pagaments</div>
     <div class="bni" id="bni-grafiques" onclick="goTo('grafiques',null,this)"><div class="bni-ic">&#128200;</div>Graf.</div>
+    <div class="bni" id="bni-despeses" onclick="goTo('despeses',null,this)"><div class="bni-ic">&#128176;</div>Despeses</div>
     <div class="bni" id="bni-calendari" onclick="goTo('calendari',null,this)"><div class="bni-ic">&#128197;</div>Agenda</div>
   </div>
 </div>
@@ -317,7 +395,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   <div class="fg">
     <div><lbl>Nom</lbl><input id="cn" placeholder="Nom complet"></div>
     <div><lbl>Codi WhatsApp (4 d&#237;gits)</lbl><input id="cco" placeholder="1234" maxlength="4"></div>
-    <div class="ff"><lbl>Servei habitual</lbl><select id="csrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Per dies</option><option>Habitaci&#243; per dies</option></select></div>
+    <div class="ff"><lbl>Servei habitual</lbl><select id="csrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; per dies</option></select></div>
     <div class="ff"><lbl>Notes</lbl><textarea id="cnotes" rows="2"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
@@ -327,12 +405,12 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 </div></div>
 
 <div class="mo" id="m-ns"><div class="md" style="overflow:visible">
-  <div class="mh"><div class="mtt">Nova sessi&#243;</div><button class="xb" onclick="closeM('m-ns')">&#215;</button></div>
+  <div class="mh"><div class="mtt">Nova cita</div><button class="xb" onclick="closeM('m-ns')">&#215;</button></div>
   <div class="fg">
     <div class="ff"><lbl>Client</lbl><input type="text" id="nscli-search" placeholder="Cerca client..." autocomplete="off" oninput="filterClientList('nscli-search','nscli-list','nscli-val')" onfocus="filterClientList('nscli-search','nscli-list','nscli-val')"><div id="nscli-list" style="display:none;border:1px solid #e5e3de;border-radius:6px;max-height:180px;overflow-y:auto;margin-top:2px;background:#fff"></div><input type="hidden" id="nscli-val"></div>
     <div><lbl>Data</lbl><input id="nsdata" type="date"></div>
     <div><lbl>Hora</lbl><input id="nshora" type="time" value="10:00"></div>
-    <div><lbl>Servei</lbl><select id="nssrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Per dies</option><option>Habitaci&#243; per dies</option><option>Camino Santiago</option></select></div>
+    <div><lbl>Servei</lbl><select id="nssrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Habitaci&#243; per dies</option><option>Camino Santiago</option></select></div>
     <div><lbl>Preu (&#8364;)</lbl><input id="nspreu" type="number" value="80"></div>
     <div><lbl>Terapeuta</lbl><select id="nster"><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option><option>Habitaci&#243; per Dies</option></select></div>
     <div><lbl>Pagament</lbl><select id="nspay"><option>Cash</option><option>Bizum</option><option>Credit Card</option><option>Transfer&#232;ncia</option></select></div>
@@ -362,11 +440,11 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 </div></div>
 
 <div class="mo" id="m-es"><div class="md">
-  <div class="mh"><div class="mtt">Editar sessi&#243;</div><button class="xb" onclick="closeM('m-es')">&#215;</button></div>
+  <div class="mh"><div class="mtt">Editar cita</div><button class="xb" onclick="closeM('m-es')">&#215;</button></div>
   <input type="hidden" id="es-id">
   <div class="fg">
     <div class="ff"><lbl>Client</lbl><input id="es-cli" readonly style="background:#f7f6f3;color:#888"></div>
-    <div class="ff"><lbl>Servei</lbl><select id="es-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Per dies</option><option>Habitaci&#243; per dies</option><option>Camino Santiago</option></select></div>
+    <div class="ff"><lbl>Servei</lbl><select id="es-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Habitaci&#243; per dies</option><option>Camino Santiago</option></select></div>
     <div><lbl>Data</lbl><input id="es-data" type="date"></div>
     <div><lbl>Hora</lbl><input id="es-hora" type="time"></div>
     <div><lbl>Preu (&#8364;)</lbl><input id="es-preu" type="number"></div>
@@ -603,7 +681,7 @@ function drawSessions(){
   var list=filtS(), pages=Math.ceil(list.length/PAGE)||1;
   if(sPage>pages) sPage=1;
   var sl=list.slice((sPage-1)*PAGE,sPage*PAGE);
-  var cntEl=ge('s-cnt'); if(cntEl) cntEl.textContent='('+list.length+' sessions)';
+  var cntEl=ge('s-cnt'); if(cntEl) cntEl.textContent='('+list.length+' cites)';
   var tb=ge('s-tb');
   if(!sl.length){ tb.innerHTML='<tr><td colspan="8" class="empty">Cap sessió</td></tr>'; drawPager('s-pg',0,1,function(){}); return; }
   var rows='';
@@ -881,6 +959,7 @@ function goTo(page,sideEl,mobEl){
   if(page==='recordatoris') drawReminders();
   if(page==='grafiques') drawGraf();
   if(page==='calendari'){ drawCal(); drawReminders(); }
+  if(page==='despeses'){ ge('nd-data').value=today(); updateProdSelect(); drawDespeses(); }
 }
 
 function openM(id){
@@ -968,7 +1047,9 @@ async function loadFromSb(){
     var rS=await fetch(sbUrl+'/rest/v1/sessions?select=*&order=data.desc&limit=2000',{headers:{'apikey':sbKey,'Authorization':'Bearer '+sbKey}});
     var rC=await fetch(sbUrl+'/rest/v1/clients?select=*&order=sessions.desc&limit=1000',{headers:{'apikey':sbKey,'Authorization':'Bearer '+sbKey}});
     var rR=await fetch(sbUrl+'/rest/v1/recordatoris?select=*&order=data.asc',{headers:{'apikey':sbKey,'Authorization':'Bearer '+sbKey}});
-    var ds=await rS.json(), dc=await rC.json(), dr=await rR.json();
+    var rD=await fetch(sbUrl+'/rest/v1/despeses?select=*&order=data.desc&limit=2000',{headers:{'apikey':sbKey,'Authorization':'Bearer '+sbKey}});
+    var ds=await rS.json(), dc=await rC.json(), dr=await rR.json(), dd=await rD.json();
+    if(Array.isArray(dd)&&dd.length){ despeses=dd; nextDid=Math.max.apply(null,dd.map(function(d){ return d.id||0; }).concat([0]))+1; }
     if(Array.isArray(dc)&&dc.length){
       // Merge: preserve local telefon/poblacio if Supabase returns null
       var localMap={};
@@ -1386,6 +1467,152 @@ document.addEventListener('click', function(e) {
   });
 });
 
+
+/* ======== DESPESES ======== */
+var despeses = [];
+var nextDid = 1;
+var dPage = 1;
+
+var PROD_MAP = {
+  'Subministraments': ['Oli de coco','Altres olis','Lubricant','Funda capçal','Productes de neteja','Begudes','Altres subministraments'],
+  'Equipament': ['Camilla','Roba','Electrònica'],
+  'Marketing': ['Campanyes','Xarxes socials','Web'],
+  'Altres despeses': ['Varis']
+};
+
+function updateProdSelect() {
+  var cat = ge('nd-cat').value;
+  var prods = PROD_MAP[cat] || [];
+  ge('nd-prod').innerHTML = prods.map(function(p){ return '<option>'+p+'</option>'; }).join('');
+}
+
+function updateProdSelectEdit() {
+  var cat = ge('ed-cat').value;
+  var prods = PROD_MAP[cat] || [];
+  ge('ed-prod').innerHTML = prods.map(function(p){ return '<option>'+p+'</option>'; }).join('');
+}
+
+function filtD() {
+  var cat = gv('df-cat'), prod = gv('df-prod'), fr = gv('df-fr'), to = gv('df-to');
+  var list = despeses;
+  if(cat) list = list.filter(function(d){ return d.categoria === cat; });
+  if(prod) list = list.filter(function(d){ return d.producte === prod; });
+  if(fr) list = list.filter(function(d){ return d.data >= fr; });
+  if(to) list = list.filter(function(d){ return d.data <= to; });
+  return list.slice().sort(function(a,b){ return String(b.data).localeCompare(String(a.data)); });
+}
+
+function clearDF() {
+  ['df-fr','df-to'].forEach(function(id){ var e=ge(id); if(e) e.value=''; });
+  ['df-cat','df-prod'].forEach(function(id){ var e=ge(id); if(e) e.value=''; });
+  drawDespeses();
+}
+
+function drawDespeses() {
+  var list = filtD();
+  var total = list.reduce(function(a,d){ return a + (d.preu||0); }, 0);
+  var mk = mesKey(0);
+  var mesTot = despeses.filter(function(d){ return String(d.data).startsWith(mk); }).reduce(function(a,d){ return a+(d.preu||0); },0);
+
+  // Metrics
+  var catTots = {};
+  despeses.forEach(function(d){ catTots[d.categoria]=(catTots[d.categoria]||0)+(d.preu||0); });
+  var metHtml = '<div class="met"><div class="mv">'+fmtNum(total)+'€</div><div class="ml">Total filtrat</div></div>'
+    + '<div class="met"><div class="mv">'+fmtNum(mesTot)+'€</div><div class="ml">Aquest mes</div></div>'
+    + '<div class="met"><div class="mv">'+list.length+'</div><div class="ml">Entrades</div></div>'
+    + '<div class="met"><div class="mv">'+fmtNum(despeses.reduce(function(a,d){ return a+(d.preu||0); },0))+'€</div><div class="ml">Total global</div></div>';
+  ge('d-met').innerHTML = metHtml;
+
+  // Update product filter options based on selected category
+  var cat = gv('df-cat');
+  var prodEl = ge('df-prod');
+  if(prodEl) {
+    var prods = cat ? (PROD_MAP[cat]||[]) : Object.values(PROD_MAP).reduce(function(a,b){ return a.concat(b); },[]);
+    prodEl.innerHTML = '<option value="">Tots</option>' + prods.map(function(p){ return '<option>'+p+'</option>'; }).join('');
+  }
+
+  // Table
+  var pages = Math.ceil(list.length / PAGE) || 1;
+  if(dPage > pages) dPage = 1;
+  var sl = list.slice((dPage-1)*PAGE, dPage*PAGE);
+  var tb = ge('d-tb');
+  if(!sl.length){ tb.innerHTML = '<tr><td colspan="6" class="empty">Cap despesa</td></tr>'; drawPager('d-pg',0,1,function(){}); return; }
+  tb.innerHTML = sl.map(function(d){
+    return '<tr>'
+      +'<td style="font-size:11px;white-space:nowrap">'+fd(d.data)+'</td>'
+      +'<td><span class="badge bp" style="font-size:10px">'+String(d.categoria||'')+'</span></td>'
+      +'<td style="font-size:12px">'+String(d.producte||'')+'</td>'
+      +'<td style="font-weight:700;color:#c0392b;white-space:nowrap">'+fmtNum(d.preu||0)+'€</td>'
+      +'<td style="font-size:11px;color:#666;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+String(d.notes||'')+'</td>'
+      +'<td><button class="btn btns" onclick="openEditDespesa('+d.id+')">Editar</button></td>'
+      +'</tr>';
+  }).join('');
+  drawPager('d-pg', pages, dPage, function(p){ dPage=p; drawDespeses(); });
+}
+
+function doAddDespesa() {
+  var preu = parseInt(gv('nd-preu')||0)||0;
+  var data = gv('nd-data') || today();
+  var d = {
+    id: nextDid++,
+    data: data,
+    preu: preu,
+    categoria: gv('nd-cat'),
+    producte: gv('nd-prod'),
+    notes: gv('nd-notes')
+  };
+  despeses.unshift(d);
+  if(sbOn) sbInsert('despeses', d);
+  closeM('m-nd');
+  drawDespeses();
+}
+
+function openEditDespesa(id) {
+  var d = null;
+  for(var i=0;i<despeses.length;i++){ if(despeses[i].id===id){ d=despeses[i]; break; } }
+  if(!d) return;
+  ge('ed-id').value = d.id;
+  ge('ed-data').value = d.data || '';
+  ge('ed-preu').value = d.preu || 0;
+  ge('ed-cat').value = d.categoria || 'Subministraments';
+  updateProdSelectEdit();
+  ge('ed-prod').value = d.producte || '';
+  ge('ed-notes').value = d.notes || '';
+  openM('m-ed');
+}
+
+function doEditDespesa() {
+  var id = parseInt(ge('ed-id').value);
+  var d = null;
+  for(var i=0;i<despeses.length;i++){ if(despeses[i].id===id){ d=despeses[i]; break; } }
+  if(!d) return;
+  d.data = gv('ed-data');
+  d.preu = parseInt(gv('ed-preu')||0)||0;
+  d.categoria = gv('ed-cat');
+  d.producte = gv('ed-prod');
+  d.notes = gv('ed-notes');
+  if(sbOn) sbUpdate('despeses', id, d);
+  closeM('m-ed');
+  drawDespeses();
+}
+
+function confirmDelDespesa() {
+  var id = parseInt(ge('ed-id').value);
+  var d = null;
+  for(var i=0;i<despeses.length;i++){ if(despeses[i].id===id){ d=despeses[i]; break; } }
+  if(!d) return;
+  if(!confirm('Eliminar aquesta despesa de ' + fmtNum(d.preu) + '€ (' + d.producte + ')? No es pot desfer.')) return;
+  despeses = despeses.filter(function(x){ return x.id !== id; });
+  if(sbOn && sbUrl && sbKey){
+    fetch(sbUrl+'/rest/v1/despeses?id=eq.'+id, {
+      method:'DELETE',
+      headers:{'apikey':sbKey,'Authorization':'Bearer '+sbKey}
+    }).catch(function(e){ console.error(e); });
+  }
+  closeM('m-ed');
+  drawDespeses();
+}
+
 </script>
 
 <div class="mo" id="m-ec"><div class="md" style="width:420px">
@@ -1396,7 +1623,7 @@ document.addEventListener('click', function(e) {
     <div><lbl>Codi WhatsApp (4 d&#237;gits)</lbl><input id="ec-codi" placeholder="1234" maxlength="4" style="font-family:monospace"></div>
     <div><lbl>Tel&#232;fon</lbl><input id="ec-tel" placeholder="+34 6xx xxx xxx" type="tel"></div>
     <div><lbl>Poblaci&#243;</lbl><input id="ec-pob" placeholder="Girona, Barcelona..."></div>
-    <div class="ff"><lbl>Servei habitual</lbl><select id="ec-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Per dies</option><option>Habitaci&#243; per dies</option></select></div>
+    <div class="ff"><lbl>Servei habitual</lbl><select id="ec-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Habitaci&#243; per dies</option></select></div>
     <div class="ff"><lbl>Notes</lbl><textarea id="ec-notes-c" rows="2"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
