@@ -100,17 +100,17 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 .kpi-sub{margin-top:8px;font-size:12px;color:#7b7b7b}
 .insight{background:linear-gradient(135deg,#fffdf7,#f8fbfa);border:1px solid #ece4cc;border-radius:12px;padding:14px}
 .insight strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#9a7b14;margin-bottom:8px}
-.split-bars{display:flex;align-items:flex-end;gap:8px;height:180px;padding-top:6px}
-.split-col{flex:1;min-width:0;text-align:center}
-.split-bars-stack{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:132px}
-.split-bar{width:12px;border-radius:5px 5px 0 0;min-height:2px}
-.split-amount{font-size:9px;font-weight:700;color:#6b7280;min-height:12px;margin-bottom:4px}
-.split-label{font-size:10px;color:#9ca3af;margin-top:6px}
+.split-bars{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;padding-top:6px}
+.split-col{min-width:0}
+.split-bars-stack{display:flex;flex-direction:column;gap:4px}
+.split-bar{margin-bottom:10px}
+.split-amount{font-size:11px;font-weight:700;color:#6b7280;margin-top:4px}
+.split-label{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:#5f6d66;margin-bottom:4px}
 .mini-note{font-size:11px;color:#8b8b8b}
 @media(max-width:700px){
   .kpi-grid{grid-template-columns:1fr 1fr}
-  .split-bars{overflow-x:auto;padding-bottom:4px}
-  .split-col{min-width:42px}
+  .split-bars{grid-template-columns:1fr;padding-bottom:4px}
+  .split-col{min-width:0}
 }
 /* MOBILE CARDS */
 .cc-list{display:none;flex-direction:column;gap:8px;margin-bottom:1rem}
@@ -922,16 +922,16 @@ function drawGraf(){
       +'<span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;background:#0b6e55;border-radius:2px"></span>Ingressos</span>'
       +'<span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;background:#c0392b;border-radius:2px"></span>Despeses</span>'
       +'</div>'
-      +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:10px;align-items:end">'
+      +'<div style="display:flex;gap:12px;align-items:stretch;overflow-x:auto;padding:4px 2px 8px">'
       +evoMonths.map(function(mm,i){
         var ingMes=evoIng[i], desMes=evoDes[i];
         var ingH=Math.max(ingMes>0?18:0,Math.round(ingMes/maxE*120));
         var desH=Math.max(desMes>0?18:0,Math.round(desMes/maxE*120));
-        return '<div style="padding:10px 8px;border:1px solid #e8ece7;border-radius:12px;background:#fbfcfb" title="'+fmtM(mm)+' · Ing:'+fmtNum(ingMes)+'€ Des:'+fmtNum(desMes)+'€">'
+        return '<div style="min-width:112px;flex:0 0 112px;padding:12px 10px;border:1px solid #e8ece7;border-radius:12px;background:#fbfcfb" title="'+fmtM(mm)+' · Ing:'+fmtNum(ingMes)+'€ Des:'+fmtNum(desMes)+'€">'
           +'<div style="font-size:10px;color:#7b8a82;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">'+fmtM(mm)+'</div>'
           +'<div style="display:flex;align-items:flex-end;justify-content:center;gap:8px;height:124px">'
-          +'<div style="width:20px;background:#0b6e55;border-radius:8px 8px 0 0;height:'+ingH+'px"></div>'
-          +'<div style="width:20px;background:#c0392b;border-radius:8px 8px 0 0;height:'+desH+'px"></div>'
+          +'<div style="width:28px;background:#0b6e55;border-radius:8px 8px 0 0;height:'+ingH+'px"></div>'
+          +'<div style="width:28px;background:#c0392b;border-radius:8px 8px 0 0;height:'+desH+'px"></div>'
           +'</div>'
           +'<div style="display:flex;justify-content:space-between;gap:6px;margin-top:8px;font-size:10px;color:#5f6d66">'
           +'<span>'+fmtNum(ingMes)+'€</span><span>'+fmtNum(desMes)+'€</span>'
@@ -940,6 +940,30 @@ function drawGraf(){
       }).join('')
       +'</div>';
   }
+  var catMap={}, srvMap={}, terCount={}, terAmt={};
+  comp.forEach(function(s){
+    catMap[s.categoria]=(catMap[s.categoria]||0)+s.preu;
+    srvMap[s.servei]=(srvMap[s.servei]||0)+s.preu;
+    terAmt[s.terapeuta]=(terAmt[s.terapeuta]||0)+s.preu;
+  });
+  gd.forEach(function(s){
+    terCount[s.terapeuta]=(terCount[s.terapeuta]||0)+1;
+  });
+  var catEntries=Object.entries(catMap).sort(function(a,b){ return b[1]-a[1]; });
+  var srvEntries=Object.entries(srvMap).sort(function(a,b){ return b[1]-a[1]; }).slice(0,10);
+  var terEntries=Object.entries(terCount).sort(function(a,b){ return b[1]-a[1]; });
+  var catTotal=catEntries.reduce(function(a,e){ return a+e[1]; },0)||1;
+  var srvTotal=srvEntries.reduce(function(a,e){ return a+e[1]; },0)||1;
+  ge('g-cat').innerHTML=catEntries.length?catEntries.map(function(e,i){
+    var pct=Math.round(e[1]/catTotal*100);
+    return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">'+e[0]+'</span><span style="font-weight:700">'+fmtNum(e[1])+'€ ('+pct+'%)</span></div><div class="pb"><div class="pf" style="width:'+pct+'%;background:'+COLORS[i%COLORS.length]+'"></div></div></div>';
+  }).join(''):'<div class="mini-note">Sense dades per al filtre actual.</div>';
+  ge('g-srv').innerHTML=srvEntries.length?srvEntries.map(function(e,i){
+    var pct=Math.round(e[1]/srvTotal*100);
+    return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">'+e[0]+'</span><span style="font-weight:700">'+fmtNum(e[1])+'€ ('+pct+'%)</span></div><div class="pb"><div class="pf" style="width:'+pct+'%;background:'+COLORS[i%COLORS.length]+'"></div></div></div>';
+  }).join(''):'<div class="mini-note">Sense dades per al filtre actual.</div>';
+  if(terEntries.length) progBarsAmt('g-ter',terEntries,terEntries.reduce(function(a,e){ return a+e[1]; },0),terAmt);
+  else ge('g-ter').innerHTML='<div class="mini-note">Sense dades per al filtre actual.</div>';
   drawAllYearsChart()
   var cmap={};
   gd.forEach(function(s){ if(!cmap[s.client]) cmap[s.client]={n:0,e:0}; cmap[s.client].n++; if(s.estat==='Completat') cmap[s.client].e+=s.preu; });
