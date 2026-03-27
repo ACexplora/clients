@@ -886,7 +886,7 @@ function drawDashboard(){
   ge('db-blbl').innerHTML=months.map(function(m){ return '<span>'+m.slice(5)+'</span>'; }).join('');
 
   var upcomingSessions=sessions.filter(function(s){
-    return s.data && s.data>=tdy && s.estat!=='Cancel·lat' && s.estat!=='No presentat';
+    return s.data && s.data>=tdy && s.estat==='Programat';
   }).sort(function(a,b){
     var aa=String(a.data||'')+' '+String(a.hora||''), bb=String(b.data||'')+' '+String(b.hora||'');
     return aa.localeCompare(bb);
@@ -912,7 +912,7 @@ function drawDashboard(){
   var nextItems=upcomingSessions.concat(upcomingRem).sort(function(a,b){ return a.sortKey.localeCompare(b.sortKey); }).slice(0,6);
   ge('db-next').innerHTML=nextItems.length?'<div class="dash-list">'+nextItems.map(function(it){
     return '<div class="dash-item"><div class="dash-main"><div class="dash-title">'+it.title+'</div><div class="dash-sub">'+it.sub+'</div></div><div class="dash-note">'+it.val+'</div></div>';
-  }).join('')+'</div>':'<div class="dash-empty">No hi ha activitat pròxima.</div>';
+  }).join('')+'</div><div class="mini-note" style="margin-top:10px">'+upcomingSessions.length+' cites programades · '+reminders.filter(function(r){ return r.data && r.data>=tdy; }).length+' recordatoris pendents</div>':'<div class="dash-empty">No hi ha activitat pròxima.</div>';
 
   ge('db-pending').innerHTML=pendingAll.length?'<div class="dash-list">'+pendingAll.slice().sort(function(a,b){
     return String(a.data||'').localeCompare(String(b.data||''));
