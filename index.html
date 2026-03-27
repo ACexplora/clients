@@ -295,10 +295,6 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     </div>
   </div>
   <div class="card" style="padding:.75rem;overflow-x:auto" id="cal-body"></div>
-</div>
-
-</div>
-
 
 <div class="page" id="page-despeses">
   <div class="ph">
@@ -307,6 +303,8 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   </div>
   <div class="mets" id="d-met"></div>
   <div class="fbar">
+    <div class="fg2"><div class="flbl">Any</div><select id="df-any-chart" class="fs" onchange="drawDespeses()"><option value="">Tots</option></select></div>
+    <div class="fg2"><div class="flbl">Mes</div><select id="df-mes-chart" class="fs" onchange="drawDespeses()"><option value="">Tots</option><option value="01">Gen</option><option value="02">Feb</option><option value="03">Mar</option><option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option><option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Des</option></select></div>
     <div class="fg2"><div class="flbl">Categoria</div>
       <select id="df-cat" class="fs" onchange="drawDespeses()">
         <option value="">Totes</option>
@@ -326,6 +324,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <tbody id="d-tb"></tbody></table>
   </div>
   <div id="d-pg" class="pager"></div>
+  <div id="d-chart" style="margin-top:1.25rem"></div>
 </div>
 
 <div class="mo" id="m-nd"><div class="md" style="width:440px">
@@ -1494,7 +1493,10 @@ function updateProdSelectEdit() {
 
 function filtD() {
   var cat = gv('df-cat'), prod = gv('df-prod'), fr = gv('df-fr'), to = gv('df-to');
+  var fy = gv('df-any-chart'), fm = gv('df-mes-chart');
   var list = despeses;
+  if(fy) list = list.filter(function(d){ return String(d.data).slice(0,4)===fy; });
+  if(fm) list = list.filter(function(d){ return String(d.data).slice(5,7)===fm; });
   if(cat) list = list.filter(function(d){ return d.categoria === cat; });
   if(prod) list = list.filter(function(d){ return d.producte === prod; });
   if(fr) list = list.filter(function(d){ return d.data >= fr; });
@@ -1504,11 +1506,23 @@ function filtD() {
 
 function clearDF() {
   ['df-fr','df-to'].forEach(function(id){ var e=ge(id); if(e) e.value=''; });
-  ['df-cat','df-prod'].forEach(function(id){ var e=ge(id); if(e) e.value=''; });
+  ['df-cat','df-prod','df-any-chart','df-mes-chart'].forEach(function(id){ var e=ge(id); if(e) e.value=''; });
   drawDespeses();
 }
 
 function drawDespeses() {
+  // Populate year select
+  var ayEl = ge('df-any-chart');
+  if(ayEl && ayEl.options.length <= 1) {
+    var anys = {}, seenY = {};
+    for(var i=0;i<despeses.length;i++){
+      var y = String(despeses[i].data||'').slice(0,4);
+      if(y && !seenY[y]){ seenY[y]=1; anys[y]=1; }
+    }
+    Object.keys(anys).sort().reverse().forEach(function(y){
+      var o = document.createElement('option'); o.value=y; o.textContent=y; ayEl.appendChild(o);
+    });
+  }
   var list = filtD();
   var total = list.reduce(function(a,d){ return a + (d.preu||0); }, 0);
   var mk = mesKey(0);
@@ -1548,6 +1562,56 @@ function drawDespeses() {
       +'</tr>';
   }).join('');
   drawPager('d-pg', pages, dPage, function(p){ dPage=p; drawDespeses(); });
+  drawDespesesChart();
+}
+
+function drawDespesesChart() {
+  var el = ge('d-chart'); if(!el) return;
+  var fy = gv('df-any-chart'), fm = gv('df-mes-chart');
+  var base = despeses;
+  if(fy) base = base.filter(function(d){ return String(d.data).slice(0,4)===fy; });
+  if(fm) base = base.filter(function(d){ return String(d.data).slice(5,7)===fm; });
+
+  // Build 12 months back or selected year
+  var months = [];
+  if(fy) {
+    for(var m=1;m<=12;m++) months.push(fy+'-'+(m<10?'0':'')+m);
+  } else {
+    for(var i=11;i>=0;i--){ var d=new Date(); d.setMonth(d.getMonth()-i); months.push(d.toISOString().slice(0,7)); }
+  }
+  if(fm) months = months.filter(function(m){ return m.slice(5,7)===fm; });
+
+  var vals = months.map(function(m){
+    return base.filter(function(d){ return String(d.data).startsWith(m); }).reduce(function(a,d){ return a+(d.preu||0); },0);
+  });
+  var maxV = Math.max.apply(null, vals.concat([1]));
+
+  var barsHtml = vals.map(function(v,i){
+    return '<div class="bw" title="'+fmtM(months[i])+': '+fmtNum(v)+'€">'
+      +'<div style="font-size:8px;font-weight:700;color:#c0392b">'+(v?fmtNum(v):'')+'</div>'
+      +'<div class="bar" style="height:'+Math.round(v/maxV*100)+'px;background:#c0392b"></div>'
+      +'</div>';
+  }).join('');
+  var lblHtml = months.map(function(m){ return '<span>'+m.slice(5)+'</span>'; }).join('');
+
+  // Category breakdown
+  var catTots = {};
+  base.forEach(function(d){ catTots[d.categoria]=(catTots[d.categoria]||0)+(d.preu||0); });
+  var totalCat = Object.values(catTots).reduce(function(a,v){ return a+v; },0)||1;
+  var catHtml = Object.entries(catTots).sort(function(a,b){ return b[1]-a[1]; }).map(function(e,i){
+    var pct = Math.round(e[1]/totalCat*100);
+    return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px">'
+      +'<span style="font-weight:600">'+e[0]+'</span><span style="font-weight:700;color:#c0392b">'+fmtNum(e[1])+'€ ('+pct+'%)</span></div>'
+      +'<div class="pb"><div class="pf" style="width:'+pct+'%;background:'+COLORS[i%COLORS.length]+'"></div></div></div>';
+  }).join('');
+
+  el.innerHTML = '<div class="g2">'
+    +'<div class="card"><div class="stit">Despeses mensuals</div>'
+    +'<div class="bwrap" id="d-bars">'+barsHtml+'</div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:9px;color:#bbb;margin-top:3px">'+lblHtml+'</div>'
+    +'</div>'
+    +'<div class="card"><div class="stit">Per categoria</div>'+catHtml+'</div>'
+    +'</div>';
 }
 
 function doAddDespesa() {
