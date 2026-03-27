@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prova Supabase</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,sans-serif;background:#f7f6f3;color:#1a1a1a}
+.wrap{max-width:720px;margin:48px auto;padding:24px}
+.card{background:#fff;border:1px solid #e5e3de;border-radius:14px;padding:24px;box-shadow:0 8px 30px rgba(0,0,0,.05)}
+h1{margin:0 0 8px;font-size:28px}
+p{color:#666;line-height:1.5}
+label{display:block;font-size:12px;font-weight:700;color:#666;margin:16px 0 6px}
+input,textarea{width:100%;padding:12px 14px;border:1px solid #ccc;border-radius:8px;font:inherit}
+button{margin-top:18px;padding:12px 18px;border:0;border-radius:8px;background:#0b6e55;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+button:hover{background:#095e48}
+.log{margin-top:18px;padding:14px;border-radius:8px;background:#f5f4f0;white-space:pre-wrap;font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.ok{color:#065f46}
+.bad{color:#991b1b}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Prova de connexió amb Supabase</h1>
+    <p>Aquesta pàgina només comprova si el projecte respon, si la clau és vàlida i si existeixen les taules bàsiques.</p>
+
+    <label for="url">Project URL</label>
+    <input id="url" placeholder="https://xxxx.supabase.co">
+
+    <label for="key">Anon Public Key</label>
+    <textarea id="key" rows="6" placeholder="eyJ..."></textarea>
+
+    <button id="connectBtn" type="button">Provar connexió</button>
+
+    <div id="log" class="log">Esperant dades...</div>
+  </div>
+</div>
+
+<script>
+var urlEl = document.getElementById('url');
+var keyEl = document.getElementById('key');
+var logEl = document.getElementById('log');
+var btnEl = document.getElementById('connectBtn');
+
+function setLog(msg, ok){
+  logEl.textContent = msg;
+  logEl.className = 'log ' + (ok ? 'ok' : 'bad');
+}
+
+async function checkTable(baseUrl, key, table){
+  try{
+    var r = await fetch(baseUrl + '/rest/v1/' + table + '?select=id&limit=1', {
+      headers: { apikey: key, Authorization: 'Bearer ' + key }
+    });
+    return { table: table, ok: r.ok, status: r.status };
+  }catch(e){
+    return { table: table, ok: false, status: 'network', error: e.message };
+  }
+}
+
+btnEl.addEventListener('click', async function(){
+  var url = (urlEl.value || '').trim().replace(/\/$/, '');
+  var key = (keyEl.value || '').trim();
+  if(!url || !key){
+    setLog('Falta la URL o la clau.', false);
+    return;
+  }
+
+  btnEl.disabled = true;
+  setLog('Connectant...', true);
+
+  try{
+    var auth = await fetch(url + '/auth/v1/settings', { headers: { apikey: key } });
+    if(!auth.ok){
+      setLog('Error de projecte o clau: ' + auth.status, false);
+      btnEl.disabled = false;
+      return;
+    }
+
+    var tables = await Promise.all([
+      checkTable(url, key, 'clients'),
+      checkTable(url, key, 'sessions'),
+      checkTable(url, key, 'recordatoris'),
+      checkTable(url, key, 'despeses')
+    ]);
+
+    var lines = ['Connexió OK amb el projecte.'];
+    tables.forEach(function(t){
+      lines.push('- ' + t.table + ': ' + (t.ok ? 'OK' : 'FALTA/ERROR') + ' (' + t.status + ')');
+    });
+
+    var allCore = tables[0].ok && tables[1].ok;
+    setLog(lines.join('\n'), allCore);
+  }catch(e){
+    setLog('Error inesperat: ' + e.message, false);
+  }
+
+  btnEl.disabled = false;
+});
+</script>
+</body>
+</html>
