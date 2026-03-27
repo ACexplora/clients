@@ -1940,5 +1940,33 @@ function drawAllYearsChart() {
   };
 })();
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    if(typeof drawClients === 'function') drawClients();
+    if(typeof drawSessions === 'function') drawSessions();
+  }catch(e){
+    console.error('init-rescue', e);
+  }
+
+  try{
+    document.querySelectorAll('.sb-area .btn').forEach(function(btn){
+      btn.addEventListener('click', function(ev){
+        ev.preventDefault();
+        if(typeof openM === 'function') openM('m-sb');
+      });
+    });
+    var mob = document.getElementById('dbst-mob');
+    if(mob){
+      mob.addEventListener('click', function(ev){
+        ev.preventDefault();
+        if(typeof openM === 'function') openM('m-sb');
+      });
+    }
+  }catch(e){
+    console.error('supabase-button-rescue', e);
+  }
+});
+</script>
 </body>
 </html>
