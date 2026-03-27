@@ -291,7 +291,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   <div class="g2"><div class="card" id="g-act"></div><div class="card" id="g-prev"></div></div>
   <div class="card" id="g-evcard">
     <div class="stit" id="g-evlbl">Evoluci&#243; mensual</div>
-    <div class="mini-note" style="margin-bottom:10px">Comparativa d'ingressos i despeses per mes. Verd = ingressos, vermell = despeses.</div>
+    <div class="mini-note" style="margin-bottom:10px">Ingressos mensuals dels últims 12 mesos o de l'any seleccionat.</div>
     <div id="g-evbars-wrap"></div>
     <div id="g-allyears-wrap" style="margin-top:1.5rem;display:none">
       <div class="stit">Evoluci&#243; tots els anys <span style="font-size:11px;color:#aaa;font-weight:400">&mdash; <span style="color:#0b6e55">&#9644;</span> Ingressos &nbsp;<span style="color:#c0392b">&#9644;</span> Despeses</span></div>
@@ -785,7 +785,7 @@ function drawSessions(){
       +'<td><div class="row"><div class="av">'+ini(s.client)+'</div><span style="font-size:12px;overflow:hidden;text-overflow:ellipsis;max-width:130px;display:inline-block">'+String(s.client||'')+'</span></div></td>'
       +'<td>'+(s.codi?'<span class="ctag">'+s.codi+'</span>':'â€”')+'</td>'
       +'<td style="font-size:11px">'+String(s.servei||'')+'</td>'
-      +'<td style="font-weight:700;color:#0b6e55;white-space:nowrap">'+(s.preu>0?fmtNum(s.preu)+'â‚¬':'â€”')+(s.preu_compte>0?'<br><span style="font-size:9px;color:#b45309;font-weight:600">â†³'+fmtNum(s.preu_compte)+'â‚¬ compte</span>':'')+'</td>'
+      +'<td style="font-weight:700;color:#0b6e55;white-space:nowrap">'+(s.preu>0?fmtNum(s.preu)+'€':'—')+(s.preu_compte>0?'<br><span style="font-size:9px;color:#b45309;font-weight:600">Compte: '+fmtNum(s.preu_compte)+'€</span>':'')+'</td>'
       +'<td style="font-size:11px">'+String(s.terapeuta||'')+'</td>'
       +'<td>'+estatB(s.estat)+'</td>'
       +'<td><button class="btn btns" onclick="openEdit('+s.id+')">Editar</button></td>'
@@ -981,22 +981,17 @@ function drawGraf(){
   if(wrapEl){
     wrapEl.innerHTML='<div style="display:flex;gap:12px;margin-bottom:10px;font-size:11px;flex-wrap:wrap">'
       +'<span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;background:#0b6e55;border-radius:2px"></span>Ingressos</span>'
-      +'<span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;background:#c0392b;border-radius:2px"></span>Despeses</span>'
       +'</div>'
-      +'<div style="display:flex;gap:12px;align-items:stretch;overflow-x:auto;padding:4px 2px 8px">'
+      +'<div style="display:flex;gap:10px;align-items:flex-end;overflow-x:auto;padding:8px 2px 10px">'
       +evoMonths.map(function(mm,i){
-        var ingMes=evoIng[i], desMes=evoDes[i];
+        var ingMes=evoIng[i];
         var ingH=Math.max(ingMes>0?18:0,Math.round(ingMes/maxE*120));
-        var desH=Math.max(desMes>0?18:0,Math.round(desMes/maxE*120));
-        return '<div style="min-width:112px;flex:0 0 112px;padding:12px 10px;border:1px solid #e8ece7;border-radius:12px;background:#fbfcfb" title="'+fmtM(mm)+' · Ing:'+fmtNum(ingMes)+'€ Des:'+fmtNum(desMes)+'€">'
-          +'<div style="font-size:10px;color:#7b8a82;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">'+fmtM(mm)+'</div>'
-          +'<div style="display:flex;align-items:flex-end;justify-content:center;gap:8px;height:124px">'
-          +'<div style="width:28px;background:#0b6e55;border-radius:8px 8px 0 0;height:'+ingH+'px"></div>'
-          +'<div style="width:28px;background:#c0392b;border-radius:8px 8px 0 0;height:'+desH+'px"></div>'
+        return '<div class="bw" style="min-width:64px;flex:0 0 64px" title="'+fmtM(mm)+' · '+fmtNum(ingMes)+'€">'
+          +'<div style="display:flex;align-items:flex-end;justify-content:center;height:124px">'
+          +'<div style="width:38px;background:#0b6e55;border-radius:10px 10px 0 0;height:'+ingH+'px"></div>'
           +'</div>'
-          +'<div style="display:flex;justify-content:space-between;gap:6px;margin-top:8px;font-size:10px;color:#5f6d66">'
-          +'<span>'+fmtNum(ingMes)+'€</span><span>'+fmtNum(desMes)+'€</span>'
-          +'</div>'
+          +'<div style="margin-top:8px;font-size:10px;color:#5f6d66;text-align:center;font-weight:700">'+fmtNum(ingMes)+'€</div>'
+          +'<div style="font-size:9px;color:#9aa29d;text-align:center;margin-top:3px">'+mm.slice(5)+'</div>'
           +'</div>';
       }).join('')
       +'</div>';
