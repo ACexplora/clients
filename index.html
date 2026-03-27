@@ -108,7 +108,6 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 .split-label{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:#5f6d66;margin-bottom:4px}
 .mini-note{font-size:11px;color:#8b8b8b}
 .dash-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:1rem;margin-bottom:1rem}
-.dash-stack{display:grid;gap:1rem}
 .dash-list{display:grid;gap:10px}
 .dash-item{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #f0ede8}
 .dash-item:last-child{border-bottom:none}
@@ -236,7 +235,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div class="hero-row">
       <div>
         <div class="hero-title">Visió general del negoci</div>
-        <div class="hero-sub">Consulta en un sol cop d'ull els ingressos del mes, la pròxima activitat, els imports pendents i els clients que més pes tenen en el negoci.</div>
+        <div class="hero-sub">Consulta en un sol cop d'ull els ingressos del mes, la pròxima activitat i els clients que més pes tenen en el negoci.</div>
       </div>
       <div class="hero-pill" id="db-period">Període actual</div>
     </div>
@@ -249,16 +248,12 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
       <div id="db-bars"></div>
       <div id="db-blbl" style="display:flex;justify-content:space-between;font-size:9px;color:#bbb;margin-top:3px"></div>
     </div>
-    <div class="dash-stack">
-      <div class="card"><div class="stit">Pròximes cites i recordatoris</div><div id="db-next"></div></div>
-      <div class="card"><div class="stit">Pendents de cobrar</div><div id="db-pending"></div></div>
-    </div>
+    <div class="card"><div class="stit">Pròximes cites i recordatoris</div><div id="db-next"></div></div>
   </div>
   <div class="g2">
     <div class="card"><div class="stit">Top clients</div><div id="db-top-clients"></div></div>
     <div class="card"><div class="stit">Top serveis</div><div id="db-top-services"></div></div>
   </div>
-  <div class="card"><div class="stit">Activitat recent</div><div id="db-recent"></div></div>
 </div>
 
 <div class="page" id="page-clients">
@@ -866,9 +861,6 @@ function drawDashboard(){
   var avgMes=countMes?Math.round(ingMes/countMes):0;
   var nousMes=clients.filter(function(c){ return String(c.primera_visita||'').startsWith(mk); }).length;
   var todayOps=sessions.filter(function(s){ return s.data===tdy && s.estat!=='Cancel·lat' && s.estat!=='No presentat'; }).length;
-  var pendingAll=sessions.filter(function(s){ return s.estat==='Programat' && s.preu>0 && (s.preu-(s.preu_compte||0))>0; });
-  var pendingAmt=pendingAll.reduce(function(a,s){ return a+(s.preu-(s.preu_compte||0)); },0);
-  var pendingCount=pendingAll.length;
   ge('db-period').textContent='Mes ' + fmtM(mk);
   ge('db-met').innerHTML='<div class="kpi-grid">'
     +'<div class="kpi"><div class="kpi-top">Ingressos del mes</div><div class="kpi-val pos">'+fmtNum(ingMes)+'€</div><div class="kpi-sub">'+countMes+' operacions completades</div></div>'
@@ -914,15 +906,8 @@ function drawDashboard(){
     return '<div class="dash-item"><div class="dash-main"><div class="dash-title">'+it.title+'</div><div class="dash-sub">'+it.sub+'</div></div><div class="dash-note">'+it.val+'</div></div>';
   }).join('')+'</div><div class="mini-note" style="margin-top:10px">'+upcomingSessions.length+' cites programades · '+reminders.filter(function(r){ return r.data && r.data>=tdy; }).length+' recordatoris pendents</div>':'<div class="dash-empty">No hi ha activitat pròxima.</div>';
 
-  ge('db-pending').innerHTML=pendingAll.length?'<div class="dash-list">'+pendingAll.slice().sort(function(a,b){
-    return String(a.data||'').localeCompare(String(b.data||''));
-  }).slice(0,6).map(function(s){
-    var debt=(s.preu-(s.preu_compte||0));
-    return '<div class="dash-item"><div class="dash-main"><div class="dash-title">'+String(s.client||'')+'</div><div class="dash-sub">'+fd(s.data)+(s.servei?' · '+s.servei:'')+'</div></div><div class="dash-val">'+fmtNum(debt)+'€</div></div>';
-  }).join('')+'</div><div class="mini-note" style="margin-top:10px">'+pendingCount+' registres programats · '+fmtNum(pendingAmt)+'€ pendents</div>':'<div class="dash-empty">No hi ha imports pendents de cobrar.</div>';
-
   var byClient={}; comp.forEach(function(s){ byClient[s.client]=(byClient[s.client]||0)+s.preu; });
-  var topClients=Object.entries(byClient).sort(function(a,b){ return b[1]-a[1]; }).slice(0,6);
+  var topClients=Object.entries(byClient).sort(function(a,b){ return b[1]-a[1]; }).slice(0,10);
   ge('db-top-clients').innerHTML=topClients.length?topClients.map(function(e,i){
     var pct=Math.round(e[1]/(topClients[0][1]||1)*100);
     return '<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">'+e[0]+'</span><span style="font-weight:700">'+fmtNum(e[1])+'€</span></div><div class="pb"><div class="pf" style="width:'+pct+'%;background:'+COLORS[i%COLORS.length]+'"></div></div></div>';
@@ -935,12 +920,6 @@ function drawDashboard(){
     return '<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">'+e[0]+'</span><span style="font-weight:700">'+fmtNum(e[1])+'€</span></div><div class="pb"><div class="pf" style="width:'+pct+'%;background:'+COLORS[i%COLORS.length]+'"></div></div></div>';
   }).join(''):'<div class="dash-empty">Aquest mes encara no hi ha serveis completats.</div>';
 
-  var recent=sessions.slice().sort(function(a,b){
-    return (String(b.data||'')+' '+String(b.hora||'')).localeCompare(String(a.data||'')+' '+String(a.hora||''));
-  }).slice(0,8);
-  ge('db-recent').innerHTML=recent.length?'<div class="dash-list">'+recent.map(function(s){
-    return '<div class="dash-item"><div class="dash-main"><div class="dash-title">'+String(s.client||'')+'</div><div class="dash-sub">'+fd(s.data)+(s.hora?' · '+s.hora:'')+' · '+String(s.servei||'')+' · '+String(s.terapeuta||'')+'</div></div><div class="dash-note">'+fixMoji(s.estat||'')+(s.preu>0?' · '+fmtNum(s.preu)+'€':'')+'</div></div>';
-  }).join('')+'</div>':'<div class="dash-empty">Sense activitat recent.</div>';
 }
 
 function drawPagaments(){
