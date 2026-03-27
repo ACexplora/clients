@@ -912,7 +912,7 @@ function showDetById(id){
     +(c.telefon?'<div><span style="color:#aaa;font-size:11px;font-weight:700;text-transform:uppercase">Tel&egrave;fon</span><br><a href="tel:'+c.telefon+'" style="color:#0b6e55;font-weight:600">'+c.telefon+'</a></div>':'')
     +(c.poblacio?'<div><span style="color:#aaa;font-size:11px;font-weight:700;text-transform:uppercase">Poblaci&oacute;</span><br><span style="font-weight:600">'+c.poblacio+'</span></div>':'')
     +'</div>':'')
-    +'<div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Historial d'activitat</div>'
+    +'<div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Historial d&#39;activitat</div>'
     +'<div class="tl">'+cs.slice(0,25).map(function(s){
       return '<div class="ti"><div class="tdot"></div><div class="tc"><div style="font-size:13px;font-weight:600">'+s.servei+'</div>'
         +'<div class="tdt">'+fd(s.data)+' '+(s.hora||'')+' · '+(s.preu>0?s.preu+'€':'—')+' · '+s.terapeuta+(s.pagament?' · '+s.pagament:'')+'</div>'
