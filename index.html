@@ -264,11 +264,11 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 </div>
 
 <div class="page" id="page-pagaments">
-  <div class="ph"><div class="pt">FacturaciÃ³</div></div>
+  <div class="ph"><div class="pt">Facturació</div></div>
   <div class="mets" id="p-met"></div>
   <div class="g2">
-    <div class="card"><div class="stit">FacturaciÃ³ mensual</div><div class="bwrap" id="p-bars"></div><div id="p-blbl" style="display:flex;justify-content:space-between;font-size:9px;color:#bbb;margin-top:3px"></div></div>
-    <div class="card"><div class="stit">MÃ¨tode de cobrament</div><div id="p-mth"></div></div>
+    <div class="card"><div class="stit">Facturació mensual</div><div class="bwrap" id="p-bars"></div><div id="p-blbl" style="display:flex;justify-content:space-between;font-size:9px;color:#bbb;margin-top:3px"></div></div>
+    <div class="card"><div class="stit">Mètode de cobrament</div><div id="p-mth"></div></div>
   </div>
   <div class="card" style="padding:0;overflow-x:auto">
     <table style="min-width:600px"><thead><tr><th>Data</th><th>Client</th><th class="thide">Codi</th><th>Servei</th><th>Import</th><th class="thide">Cobrament</th><th class="thide">Responsable</th></tr></thead>
@@ -560,9 +560,70 @@ function fmtNum(n){
   return String(parseInt(n)||0).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
 }
 
+function fixMoji(txt){
+  if(txt==null) return txt;
+  return String(txt)
+    .replace(/FacturaciÃ³/g,'Facturació')
+    .replace(/MÃ¨tode/g,'Mètode')
+    .replace(/HabitaciÃ³/g,'Habitació')
+    .replace(/EvoluciÃ³/g,'Evolució')
+    .replace(/ConnexiÃ³/g,'Connexió')
+    .replace(/MÃ©s/g,'Més')
+    .replace(/mÃ©s/g,'més')
+    .replace(/mitjÃ /g,'mitjà')
+    .replace(/sessiÃ³/g,'sessió')
+    .replace(/Ãºltims/g,'últims')
+    .replace(/MarÃ§/g,'Març')
+    .replace(/Miquel VilÃ /g,'Miquel Vilà')
+    .replace(/RamÃ³n/g,'Ramón')
+    .replace(/MercÃ¨/g,'Mercè')
+    .replace(/ToÃ±i/g,'Toñi')
+    .replace(/CaliforniÃ /g,'Californià')
+    .replace(/CanadÃ /g,'Canadà')
+    .replace(/Dani RodÃ©s/g,'Dani Rodés')
+    .replace(/Josep MÂº/g,'Josep Mº')
+    .replace(/CancelÂ·lat/g,'Cancel·lat')
+    .replace(/Â·/g,'·')
+    .replace(/â‚¬/g,'€')
+    .replace(/â€“/g,'–')
+    .replace(/â€”/g,'—')
+    .replace(/â€¦/g,'…')
+    .replace(/Ã¨/g,'è')
+    .replace(/Ã©/g,'é')
+    .replace(/Ã /g,'à')
+    .replace(/Ã­/g,'í')
+    .replace(/Ã³/g,'ó')
+    .replace(/Ãº/g,'ú')
+    .replace(/Ã§/g,'ç')
+    .replace(/Ã±/g,'ñ')
+    .replace(/Âº/g,'º')
+    .replace(/Â/g,'');
+}
+
+function fixDeep(v){
+  if(Array.isArray(v)){ for(var i=0;i<v.length;i++) v[i]=fixDeep(v[i]); return v; }
+  if(v && typeof v==='object'){
+    Object.keys(v).forEach(function(k){ v[k]=fixDeep(v[k]); });
+    return v;
+  }
+  return typeof v==='string' ? fixMoji(v) : v;
+}
+
+function sanitizeDom(root){
+  var walker = document.createTreeWalker(root||document.body, NodeFilter.SHOW_TEXT, null);
+  var node;
+  while((node = walker.nextNode())){
+    var p = node.parentNode;
+    if(!p || /^(SCRIPT|STYLE|TEXTAREA)$/i.test(p.nodeName)) continue;
+    var fixed = fixMoji(node.nodeValue);
+    if(fixed !== node.nodeValue) node.nodeValue = fixed;
+  }
+}
+
 function estatB(e){
+  e = fixMoji(e||'');
   if(e==='Completat') return '<span class="badge bg">Completat</span>';
-  if(e==='CancelÂ·lat'||e==='CancelÂ·lat client') return '<span class="badge br">CancelÂ·lat</span>';
+  if(e==='Cancel·lat'||e==='Cancel·lat client') return '<span class="badge br">Cancel·lat</span>';
   if(e==='No presentat') return '<span class="badge ba">No presentat</span>';
   if(e==='Programat') return '<span class="badge bb">Programat</span>';
   return '<span class="badge bp">'+e+'</span>';
@@ -579,11 +640,11 @@ function isMassatge(s){
   for(var i=0;i<kw.length;i++){ if(String(s).indexOf(kw[i])>=0) return true; }
   return false;
 }
-function isDies(s){ var ss=String(s); return ss.indexOf('Per dies')>=0||ss.indexOf('per dies')>=0||ss.indexOf('HabitaciÃ³ per dies')>=0; }
+function isDies(s){ var ss=fixMoji(String(s)); return ss.indexOf('Per dies')>=0||ss.indexOf('per dies')>=0||ss.indexOf('Habitació per dies')>=0; }
 function catOf(s){
-  if(isDies(s)) return 'HabitaciÃ³ per dies';
+  if(isDies(s)) return 'Habitació per dies';
   if(isMassatge(s)) return 'Massatge';
-  return 'HabitaciÃ³ per hores';
+  return 'Habitació per hores';
 }
 function today(){ return new Date().toISOString().split('T')[0]; }
 function mesKey(off){ var d=new Date(); d.setMonth(d.getMonth()+off); return d.toISOString().slice(0,7); }
@@ -1108,8 +1169,8 @@ function clearCreds(){ try{ localStorage.removeItem('sb_url'); localStorage.remo
 function sbMsg(msg,ok){ var e=ge('sb-msg'); if(e){ e.textContent=msg; e.style.color=ok?'#0b6e55':'#c0392b'; } }
 function sbSetStatus(on){
   sbOn=on; var el=ge('dbst'); if(!el) return;
-  if(on){ el.textContent='â— Supabase actiu'; el.className='dbst dbok'; }
-  else{ el.textContent='â— Mode local'; el.className='dbst dboff'; }
+  if(on){ el.textContent='• Supabase actiu'; el.className='dbst dbok'; }
+  else{ el.textContent='• Mode local'; el.className='dbst dboff'; }
 }
 function sbInsert(table,row){ if(!sbUrl||!sbKey) return; fetch(sbUrl+'/rest/v1/'+table,{method:'POST',headers:{'Content-Type':'application/json','apikey':sbKey,'Authorization':'Bearer '+sbKey,'Prefer':'return=minimal'},body:JSON.stringify(row)}).catch(function(e){ console.error(e); }); }
 function sbUpdate(table,id,row){ if(!sbUrl||!sbKey) return; fetch(sbUrl+'/rest/v1/'+table+'?id=eq.'+id,{method:'PATCH',headers:{'Content-Type':'application/json','apikey':sbKey,'Authorization':'Bearer '+sbKey,'Prefer':'return=minimal'},body:JSON.stringify(row)}).catch(function(e){ console.error(e); }); }
@@ -1876,6 +1937,23 @@ function drawAllYearsChart() {
     return h;
   }
 
+  function pickSbFields(row, fields){
+    var out = {};
+    fields.forEach(function(k){
+      if(Object.prototype.hasOwnProperty.call(row, k) && row[k] !== undefined) out[k] = row[k];
+    });
+    return out;
+  }
+
+  async function sbReadError(res){
+    try{
+      var txt = await res.text();
+      return txt ? (res.status + ': ' + txt) : String(res.status);
+    }catch(e){
+      return String(res.status);
+    }
+  }
+
   async function sbCheckProjectV2(url, key){
     var r = await fetch(url + '/auth/v1/settings', { headers: { apikey: key } });
     if(!r.ok) throw new Error('Projecte o clau no valids (' + r.status + ')');
@@ -1921,21 +1999,25 @@ function drawAllYearsChart() {
 
   window.importToSb = async function(){
     var bs = 100;
+    var clientFields = ['id','nom','codi','base','sessions','total_gastat','primera_visita','ultima_visita','servei_habitual','categoria_principal','telefon','poblacio','notes'];
+    var sessionFields = ['id','data','hora','servei','categoria','preu','preu_compte','client','codi','client_base','terapeuta','notes','estat','pagament'];
     for(var i=0;i<ALLCLIENTS.length;i+=bs){
+      var clientBatch = ALLCLIENTS.slice(i, i + bs).map(function(c){ return pickSbFields(c, clientFields); });
       var rc = await fetch(sbUrl + '/rest/v1/clients', {
         method: 'POST',
         headers: sbHeadersV2({ 'Content-Type': 'application/json', Prefer: 'resolution=ignore-duplicates' }),
-        body: JSON.stringify(ALLCLIENTS.slice(i, i + bs))
+        body: JSON.stringify(clientBatch)
       });
-      if(!rc.ok) throw new Error('No s han pogut importar els clients (' + rc.status + ')');
+      if(!rc.ok) throw new Error('No s han pogut importar els clients (' + await sbReadError(rc) + ')');
     }
     for(var j=0;j<ALLSESSIONS.length;j+=bs){
+      var sessionBatch = ALLSESSIONS.slice(j, j + bs).map(function(s){ return pickSbFields(s, sessionFields); });
       var rs = await fetch(sbUrl + '/rest/v1/sessions', {
         method: 'POST',
         headers: sbHeadersV2({ 'Content-Type': 'application/json', Prefer: 'resolution=ignore-duplicates' }),
-        body: JSON.stringify(ALLSESSIONS.slice(j, j + bs))
+        body: JSON.stringify(sessionBatch)
       });
-      if(!rs.ok) throw new Error('No s han pogut importar les sessions (' + rs.status + ')');
+      if(!rs.ok) throw new Error('No s han pogut importar les sessions (' + await sbReadError(rs) + ')');
     }
     sbMsg('Import completat!', true);
   };
@@ -1947,10 +2029,12 @@ function drawAllYearsChart() {
       var dr = await sbFetchTableV2('recordatoris', '?select=*&order=data.asc');
       var dd = await sbFetchTableV2('despeses', '?select=*&order=data.desc&limit=2000');
       if(Array.isArray(dd) && dd.length){
+        fixDeep(dd);
         despeses = dd;
         nextDid = Math.max.apply(null, dd.map(function(d){ return d.id || 0; }).concat([0])) + 1;
       }
       if(Array.isArray(dc) && dc.length){
+        fixDeep(dc);
         var localMap = {};
         for(var i=0;i<clients.length;i++) localMap[clients[i].id] = clients[i];
         dc.forEach(function(c){
@@ -1963,12 +2047,13 @@ function drawAllYearsChart() {
         });
         clients = dc;
       }
-      if(Array.isArray(ds) && ds.length) sessions = ds;
-      if(Array.isArray(dr)) reminders = dr;
+      if(Array.isArray(ds) && ds.length){ fixDeep(ds); sessions = ds; }
+      if(Array.isArray(dr)){ fixDeep(dr); reminders = dr; }
       nextCid = Math.max.apply(null, clients.map(function(c){ return c.id || 0; }).concat([0])) + 1;
       nextSid = Math.max.apply(null, sessions.map(function(s){ return s.id || 0; }).concat([0])) + 1;
       drawClients();
       drawSessions();
+      sanitizeDom(document.body);
     }catch(e){
       console.error(e);
     }
@@ -2023,8 +2108,25 @@ function drawAllYearsChart() {
 <script>
 document.addEventListener('DOMContentLoaded', function(){
   try{
+    fixDeep(ALLCLIENTS);
+    fixDeep(ALLSESSIONS);
+    fixDeep(clients);
+    fixDeep(sessions);
+    fixDeep(reminders);
+    fixDeep(despeses);
+    sanitizeDom(document.body);
+    var observer = new MutationObserver(function(){
+      sanitizeDom(document.body);
+    });
+    observer.observe(document.body, { childList:true, subtree:true, characterData:true });
+  }catch(e){
+    console.error('text-sanitize-init', e);
+  }
+
+  try{
     if(typeof drawClients === 'function') drawClients();
     if(typeof drawSessions === 'function') drawSessions();
+    sanitizeDom(document.body);
   }catch(e){
     console.error('init-rescue', e);
   }
