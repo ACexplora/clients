@@ -178,7 +178,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   <div class="logo">Angela &amp; Carles<small>Massatge Girona</small></div>
   <div class="nav on" onclick="goTo('clients',this)">&#128101; Clients</div>
   <div class="nav" onclick="goTo('sessions',this)">&#128197; Cites</div>
-  <div class="nav" onclick="goTo('pagaments',this)">&#128179; Pagaments</div>
+  <div class="nav" onclick="goTo('pagaments',this)">&#128179; Ingressos</div>
   <div class="nav" onclick="goTo('grafiques',this)">&#128200; Gr&#224;fiques</div>
   <div class="nav" onclick="goTo('calendari',this)">&#128197; Agenda</div>
   <div class="nav" onclick="goTo('despeses',this)">&#128176; Despeses</div>
@@ -240,7 +240,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 </div>
 
 <div class="page" id="page-pagaments">
-  <div class="ph"><div class="pt">Pagaments</div></div>
+  <div class="ph"><div class="pt">Ingressos</div></div>
   <div class="mets" id="p-met"></div>
   <div class="g2">
     <div class="card"><div class="stit">Ingressos mensuals</div><div class="bwrap" id="p-bars"></div><div id="p-blbl" style="display:flex;justify-content:space-between;font-size:9px;color:#bbb;margin-top:3px"></div></div>
@@ -265,7 +265,14 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   </div>
   <div class="mets" id="g-met"></div>
   <div class="g2"><div class="card" id="g-act"></div><div class="card" id="g-prev"></div></div>
-  <div class="card"><div class="stit" id="g-evlbl">Evoluci&#243; mensual</div><div class="bwrap" id="g-evbars"></div><div id="g-evlbls" style="display:flex;justify-content:space-between;font-size:9px;color:#bbb;margin-top:3px"></div></div>
+  <div class="card" id="g-evcard">
+    <div class="stit" id="g-evlbl">Evoluci&#243; mensual &nbsp;<span style="font-size:11px;color:#aaa;font-weight:400">(barres = ingressos verd / despeses vermell)</span></div>
+    <div id="g-evbars-wrap"></div>
+    <div id="g-allyears-wrap" style="margin-top:1.5rem;display:none">
+      <div class="stit">Evoluci&#243; tots els anys <span style="font-size:11px;color:#aaa;font-weight:400">&mdash; <span style="color:#0b6e55">&#9644;</span> Ingressos &nbsp;<span style="color:#c0392b">&#9644;</span> Despeses</span></div>
+      <div id="g-linechart"></div>
+    </div>
+  </div>
   <div class="g2">
     <div class="card"><div class="stit">Per categoria</div><div id="g-cat"></div></div>
     <div class="card"><div class="stit">Per terapeuta</div><div id="g-ter"></div></div>
@@ -320,12 +327,12 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div class="fg2"><div class="flbl">Fins a</div><input type="date" id="df-to" oninput="drawDespeses()"></div>
     <button class="btn btns" onclick="clearDF()">Netejar</button>
   </div>
+  <div id="d-chart" style="margin-bottom:1.25rem"></div>
   <div class="card" style="padding:0;overflow-x:auto">
     <table><thead><tr><th>Data</th><th>Categoria</th><th>Producte</th><th>Import</th><th>Notes</th><th></th></tr></thead>
     <tbody id="d-tb"></tbody></table>
   </div>
   <div id="d-pg" class="pager"></div>
-  <div id="d-chart" style="margin-top:1.25rem"></div>
 </div>
 
 </div></div>
@@ -382,7 +389,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   <div class="bnav-row">
     <div class="bni on" id="bni-clients" onclick="goTo('clients',null,this)"><div class="bni-ic">&#128101;</div>Clients</div>
     <div class="bni" id="bni-sessions" onclick="goTo('sessions',null,this)"><div class="bni-ic">&#128197;</div>Cites</div>
-    <div class="bni" id="bni-pagaments" onclick="goTo('pagaments',null,this)"><div class="bni-ic">&#128179;</div>Pagaments</div>
+    <div class="bni" id="bni-pagaments" onclick="goTo('pagaments',null,this)"><div class="bni-ic">&#128179;</div>Ingressos</div>
     <div class="bni" id="bni-grafiques" onclick="goTo('grafiques',null,this)"><div class="bni-ic">&#128200;</div>Graf.</div>
     <div class="bni" id="bni-despeses" onclick="goTo('despeses',null,this)"><div class="bni-ic">&#128176;</div>Despeses</div>
     <div class="bni" id="bni-calendari" onclick="goTo('calendari',null,this)"><div class="bni-ic">&#128197;</div>Agenda</div>
@@ -715,7 +722,7 @@ function drawPagaments(){
   var mesTot=paid.filter(function(s){ return String(s.data).startsWith(mk); }).reduce(function(a,s){ return a+s.preu; },0);
   var nC=sessions.filter(function(s){ return s.estat==='Completat'; }).length;
   var tiq=nC>0?Math.round(total/nC):0;
-  ge('p-met').innerHTML='<div class="met"><div class="mv">'+fmtNum(total)+'€</div><div class="ml">Total cobrat</div></div>'
+  ge('p-met').innerHTML='<div class="met"><div class="mv">'+fmtNum(total)+'€</div><div class="ml">Total ingressat</div></div>'
     +'<div class="met"><div class="mv">'+fmtNum(mesTot)+'€</div><div class="ml">Aquest mes</div></div>'
     +'<div class="met"><div class="mv">'+nC+'</div><div class="ml">Completades</div></div>'
     +'<div class="met"><div class="mv">'+fmtNum(tiq)+'€</div><div class="ml">Tiquet mitjà</div></div>';
@@ -851,27 +858,29 @@ function drawGraf(){
   if(ft) evoBase=evoBase.filter(function(s){ return s.terapeuta===ft; });
   if(fc2) evoBase=evoBase.filter(function(s){ return s.categoria===fc2; });
   if(fs2) evoBase=evoBase.filter(function(s){ return s.servei===fs2; });
-  var evoV=evoMonths.map(function(mm){ return evoBase.filter(function(s){ return String(s.data).startsWith(mm)&&s.estat==='Completat'; }).reduce(function(a,s){ return a+s.preu; },0); });
-  var maxE=Math.max.apply(null,evoV.concat([1]));
-  ge('g-evbars').innerHTML=evoV.map(function(v,i){
-    return '<div class="bw" title="'+fmtM(evoMonths[i])+': '+fmtNum(v)+'€"><div style="font-size:8px;font-weight:700;color:#0b6e55">'+(v||'')+'</div><div class="bar" style="height:'+Math.round(v/maxE*100)+'px;background:#0b6e55"></div></div>';
-  }).join('');
-  ge('g-evlbls').innerHTML=evoMonths.map(function(m){ return '<span>'+m.slice(5)+'</span>'; }).join('');
-  var cats={},catsE={},ters={},tersE={},srvs={},srvsE={};
-  gd.forEach(function(s){
-    cats[s.categoria]=(cats[s.categoria]||0)+1;
-    ters[s.terapeuta]=(ters[s.terapeuta]||0)+1;
-    srvs[s.servei]=(srvs[s.servei]||0)+1;
-    if(s.estat==='Completat'&&s.preu>0){
-      catsE[s.categoria]=(catsE[s.categoria]||0)+s.preu;
-      tersE[s.terapeuta]=(tersE[s.terapeuta]||0)+s.preu;
-      srvsE[s.servei]=(srvsE[s.servei]||0)+s.preu;
-    }
-  });
-  var nT=gd.length||1;
-  progBarsAmt('g-cat',Object.entries(cats).sort(function(a,b){ return b[1]-a[1]; }),nT,catsE);
-  progBarsAmt('g-ter',Object.entries(ters).sort(function(a,b){ return b[1]-a[1]; }),nT,tersE);
-  progBarsAmt('g-srv',Object.entries(srvs).sort(function(a,b){ return b[1]-a[1]; }),nT,srvsE);
+  var evoIng=evoMonths.map(function(mm){ return evoBase.filter(function(s){ return String(s.data).startsWith(mm)&&s.estat==='Completat'; }).reduce(function(a,s){ return a+s.preu; },0); });
+  var evoDes=evoMonths.map(function(mm){ return despeses.filter(function(d){ return String(d.data).startsWith(mm); }).reduce(function(a,d){ return a+(d.preu||0); },0); });
+  var maxE=Math.max.apply(null,evoIng.concat(evoDes).concat([1]));
+  var wrapEl=ge('g-evbars-wrap');
+  if(wrapEl){
+    wrapEl.innerHTML='<div style="display:flex;gap:12px;margin-bottom:6px;font-size:11px">'
+      +'<span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;background:#0b6e55;border-radius:2px"></span>Ingressos</span>'
+      +'<span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;background:#c0392b;border-radius:2px"></span>Despeses</span>'
+      +'</div>'
+      +'<div class="bwrap">'
+      +evoMonths.map(function(mm,i){
+        var ing=evoIng[i], des=evoDes[i];
+        return '<div class="bw" title="'+fmtM(mm)+' · Ing:'+fmtNum(ing)+'€ Des:'+fmtNum(des)+'€">'
+          +'<div style="display:flex;align-items:flex-end;height:100px;gap:2px;justify-content:center">'
+          +'<div style="width:8px;background:#0b6e55;border-radius:3px 3px 0 0;height:'+Math.round(ing/maxE*100)+'px;min-height:'+(ing>0?2:0)+'px"></div>'
+          +'<div style="width:8px;background:#c0392b;border-radius:3px 3px 0 0;height:'+Math.round(des/maxE*100)+'px;min-height:'+(des>0?2:0)+'px"></div>'
+          +'</div>'
+          +'<div style="font-size:8px;color:#bbb;margin-top:2px">'+mm.slice(5)+'</div>'
+          +'</div>';
+      }).join('')
+      +'</div>';
+  }
+  drawAllYearsChart()
   var cmap={};
   gd.forEach(function(s){ if(!cmap[s.client]) cmap[s.client]={n:0,e:0}; cmap[s.client].n++; if(s.estat==='Completat') cmap[s.client].e+=s.preu; });
   var top=Object.entries(cmap).sort(function(a,b){ return b[1].n-a[1].n; }).slice(0,10);
@@ -1676,6 +1685,85 @@ function confirmDelDespesa() {
   }
   closeM('m-ed');
   drawDespeses();
+}
+
+
+function drawAllYearsChart() {
+  var wrap = ge('g-allyears-wrap');
+  if(!wrap) return;
+
+  // Get all years from sessions and despeses
+  var yearsSet = {};
+  sessions.forEach(function(s){ if(s.data) yearsSet[s.data.slice(0,4)]=1; });
+  despeses.forEach(function(d){ if(d.data) yearsSet[d.data.slice(0,4)]=1; });
+  var years = Object.keys(yearsSet).sort();
+  if(years.length < 2){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+
+  // Monthly data for all time
+  var allMonths = [];
+  years.forEach(function(y){
+    for(var m=1;m<=12;m++) allMonths.push(y+'-'+(m<10?'0':'')+m);
+  });
+
+  var ingVals = allMonths.map(function(mm){
+    return sessions.filter(function(s){ return String(s.data).startsWith(mm)&&s.estat==='Completat'; }).reduce(function(a,s){ return a+s.preu; },0);
+  });
+  var desVals = allMonths.map(function(mm){
+    return despeses.filter(function(d){ return String(d.data).startsWith(mm); }).reduce(function(a,d){ return a+(d.preu||0); },0);
+  });
+
+  // Draw SVG line chart
+  var W = 700, H = 140, pad = 30;
+  var maxV = Math.max.apply(null, ingVals.concat(desVals).concat([1]));
+  var n = allMonths.length;
+
+  function px(i){ return pad + (i/(n-1||1))*(W-pad*2); }
+  function py(v){ return H - pad - (v/maxV)*(H-pad*2); }
+
+  function smoothPath(vals, color) {
+    if(vals.length < 2) return '';
+    var d = 'M'+px(0)+','+py(vals[0]);
+    for(var i=1;i<vals.length;i++){
+      var x0=px(i-1),y0=py(vals[i-1]),x1=px(i),y1=py(vals[i]);
+      var cx=(x0+x1)/2;
+      d += ' C'+cx+','+y0+' '+cx+','+y1+' '+x1+','+y1;
+    }
+    return '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round"/>';
+  }
+
+  // Year separators and labels
+  var yrLines = '', yrLabels = '';
+  years.forEach(function(y,i){
+    var mIdx = allMonths.indexOf(y+'-01');
+    if(mIdx >= 0){
+      var x = px(mIdx);
+      yrLines += '<line x1="'+x+'" y1="'+pad+'" x2="'+x+'" y2="'+(H-pad)+'" stroke="#e5e3de" stroke-width="1" stroke-dasharray="3,3"/>';
+      yrLabels += '<text x="'+(x+4)+'" y="'+(pad-4)+'" font-size="9" fill="#bbb">'+y+'</text>';
+    }
+  });
+
+  // Y axis labels
+  var yLabels = '';
+  [0, 0.25, 0.5, 0.75, 1].forEach(function(frac){
+    var v = Math.round(maxV*frac);
+    var y = py(v);
+    yLabels += '<line x1="'+pad+'" y1="'+y+'" x2="'+(W-pad)+'" y2="'+y+'" stroke="#f0ede8" stroke-width="1"/>';
+    yLabels += '<text x="'+(pad-3)+'" y="'+(y+3)+'" font-size="8" fill="#bbb" text-anchor="end">'+fmtNum(v)+'</text>';
+  });
+
+  var svg = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">'
+    + yLabels + yrLines + yrLabels
+    + smoothPath(ingVals, '#0b6e55')
+    + smoothPath(desVals, '#c0392b')
+    + '</svg>';
+
+  var canvas = ge('g-linechart');
+  if(canvas) canvas.outerHTML = '<div id="g-linechart">'+svg+'</div>';
+  else {
+    var el = ge('g-linechart');
+    if(el) el.innerHTML = svg;
+  }
 }
 
 </script>
