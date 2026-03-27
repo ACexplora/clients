@@ -107,10 +107,27 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 .split-amount{font-size:11px;font-weight:700;color:#6b7280;margin-top:4px}
 .split-label{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:#5f6d66;margin-bottom:4px}
 .mini-note{font-size:11px;color:#8b8b8b}
+.dash-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:1rem;margin-bottom:1rem}
+.dash-stack{display:grid;gap:1rem}
+.dash-list{display:grid;gap:10px}
+.dash-item{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #f0ede8}
+.dash-item:last-child{border-bottom:none}
+.dash-main{min-width:0}
+.dash-title{font-size:13px;font-weight:700;color:#1f2937}
+.dash-sub{font-size:11px;color:#7b8b84;margin-top:2px}
+.dash-val{font-size:13px;font-weight:700;color:#0b6e55;white-space:nowrap}
+.dash-note{font-size:11px;color:#9aa29d}
+.dash-empty{font-size:12px;color:#9aa29d;padding:.5rem 0}
+.hero-card{background:linear-gradient(135deg,#eef8f5,#f8fbfa);border-color:#d9ebe4}
+.hero-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.hero-title{font-size:18px;font-weight:800;color:#0b6e55;margin-bottom:6px}
+.hero-sub{font-size:13px;color:#5d6b66;line-height:1.5;max-width:720px}
+.hero-pill{padding:8px 12px;border-radius:999px;background:#fff;border:1px solid #d9ebe4;font-size:11px;font-weight:700;color:#0b6e55}
 @media(max-width:700px){
   .kpi-grid{grid-template-columns:1fr 1fr}
   .split-bars{grid-template-columns:1fr;padding-bottom:4px}
   .split-col{min-width:0}
+  .dash-grid{grid-template-columns:1fr}
 }
 /* MOBILE CARDS */
 .cc-list{display:none;flex-direction:column;gap:8px;margin-bottom:1rem}
@@ -195,10 +212,11 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 <body>
 <div class="app">
 <div class="side">
-  <div class="logo">CRM Clients<small>Programa de gestiÃ³ comercial</small></div>
-  <div class="nav on" onclick="goTo('clients',this)">&#128101; Clients</div>
+  <div class="logo">CRM Clients<small>Programa de gestió comercial</small></div>
+  <div class="nav on" onclick="goTo('dashboard',this)">&#127968; Dashboard</div>
+  <div class="nav" onclick="goTo('clients',this)">&#128101; Clients</div>
   <div class="nav" onclick="goTo('sessions',this)">&#128197; Activitat</div>
-  <div class="nav" onclick="goTo('pagaments',this)">&#128179; FacturaciÃ³</div>
+  <div class="nav" onclick="goTo('pagaments',this)">&#128179; Facturació</div>
   <div class="nav" onclick="goTo('grafiques',this)">&#128200; Informes</div>
   <div class="nav" onclick="goTo('calendari',this)">&#128197; Calendari</div>
   <div class="nav" onclick="goTo('despeses',this)">&#128176; Despeses</div>
@@ -212,7 +230,38 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 </div>
 
 
-<div class="page on" id="page-clients">
+<div class="page on" id="page-dashboard">
+  <div class="ph"><div class="pt">Dashboard</div></div>
+  <div class="card hero-card">
+    <div class="hero-row">
+      <div>
+        <div class="hero-title">Visió general del negoci</div>
+        <div class="hero-sub">Consulta en un sol cop d'ull els ingressos del mes, la pròxima activitat, els imports pendents i els clients que més pes tenen en el negoci.</div>
+      </div>
+      <div class="hero-pill" id="db-period">Període actual</div>
+    </div>
+  </div>
+  <div id="db-met"></div>
+  <div class="dash-grid">
+    <div class="card">
+      <div class="stit">Ingressos mensuals</div>
+      <div class="mini-note" style="margin-bottom:10px">Últims 12 mesos amb operacions completades.</div>
+      <div id="db-bars"></div>
+      <div id="db-blbl" style="display:flex;justify-content:space-between;font-size:9px;color:#bbb;margin-top:3px"></div>
+    </div>
+    <div class="dash-stack">
+      <div class="card"><div class="stit">Pròximes cites i recordatoris</div><div id="db-next"></div></div>
+      <div class="card"><div class="stit">Pendents de cobrar</div><div id="db-pending"></div></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="stit">Top clients</div><div id="db-top-clients"></div></div>
+    <div class="card"><div class="stit">Top serveis</div><div id="db-top-services"></div></div>
+  </div>
+  <div class="card"><div class="stit">Activitat recent</div><div id="db-recent"></div></div>
+</div>
+
+<div class="page" id="page-clients">
   <div class="ph">
     <div class="pt">Clients <span id="c-cnt" style="font-size:13px;color:#999;font-weight:400"></span></div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
@@ -412,12 +461,12 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 <!-- BOTTOM NAV MOBILE -->
 <div class="bnav">
   <div class="bnav-row">
-    <div class="bni on" id="bni-clients" onclick="goTo('clients',null,this)"><div class="bni-ic">&#128101;</div>Clients</div>
+    <div class="bni on" id="bni-dashboard" onclick="goTo('dashboard',null,this)"><div class="bni-ic">&#127968;</div>Inici</div>
+    <div class="bni" id="bni-clients" onclick="goTo('clients',null,this)"><div class="bni-ic">&#128101;</div>Clients</div>
     <div class="bni" id="bni-sessions" onclick="goTo('sessions',null,this)"><div class="bni-ic">&#128197;</div>Activitat</div>
-    <div class="bni" id="bni-pagaments" onclick="goTo('pagaments',null,this)"><div class="bni-ic">&#128179;</div>FacturaciÃ³</div>
+    <div class="bni" id="bni-pagaments" onclick="goTo('pagaments',null,this)"><div class="bni-ic">&#128179;</div>Facturació</div>
     <div class="bni" id="bni-grafiques" onclick="goTo('grafiques',null,this)"><div class="bni-ic">&#128200;</div>Graf.</div>
-    <div class="bni" id="bni-despeses" onclick="goTo('despeses',null,this)"><div class="bni-ic">&#128176;</div>Despeses</div>
-    <div class="bni" id="bni-calendari" onclick="goTo('calendari',null,this)"><div class="bni-ic">&#128197;</div>Calendari</div>
+    <div class="bni" id="bni-calendari" onclick="goTo('calendari',null,this)"><div class="bni-ic">&#128197;</div>Agenda</div>
   </div>
 </div>
 
@@ -801,6 +850,99 @@ function clearSF(){
   sPage=1; drawSessions();
 }
 
+function refreshDashboardIfVisible(){
+  var pg = ge('page-dashboard');
+  if(pg && pg.classList.contains('on')) drawDashboard();
+}
+
+function drawDashboard(){
+  var tdy=today(), mk=mesKey(0);
+  var comp=sessions.filter(function(s){ return s.estat==='Completat'; });
+  var compMes=comp.filter(function(s){ return String(s.data).startsWith(mk); });
+  var ingMes=compMes.reduce(function(a,s){ return a+s.preu; },0);
+  var despMes=despeses.filter(function(d){ return String(d.data||'').startsWith(mk); }).reduce(function(a,d){ return a+(d.preu||0); },0);
+  var netMes=ingMes-despMes;
+  var countMes=compMes.length;
+  var avgMes=countMes?Math.round(ingMes/countMes):0;
+  var nousMes=clients.filter(function(c){ return String(c.primera_visita||'').startsWith(mk); }).length;
+  var todayOps=sessions.filter(function(s){ return s.data===tdy && s.estat!=='Cancel·lat' && s.estat!=='No presentat'; }).length;
+  var pendingAll=sessions.filter(function(s){ return s.estat==='Programat' && s.preu>0 && (s.preu-(s.preu_compte||0))>0; });
+  var pendingAmt=pendingAll.reduce(function(a,s){ return a+(s.preu-(s.preu_compte||0)); },0);
+  var pendingCount=pendingAll.length;
+  ge('db-period').textContent='Mes ' + fmtM(mk);
+  ge('db-met').innerHTML='<div class="kpi-grid">'
+    +'<div class="kpi"><div class="kpi-top">Ingressos del mes</div><div class="kpi-val pos">'+fmtNum(ingMes)+'€</div><div class="kpi-sub">'+countMes+' operacions completades</div></div>'
+    +'<div class="kpi"><div class="kpi-top">Tiquet mitjà</div><div class="kpi-val">'+fmtNum(avgMes)+'€</div><div class="kpi-sub">sobre el mes actual</div></div>'
+    +'<div class="kpi"><div class="kpi-top">Clients nous</div><div class="kpi-val">'+nousMes+'</div><div class="kpi-sub">al mes actual</div></div>'
+    +'<div class="kpi"><div class="kpi-top">Resultat net</div><div class="kpi-val'+(netMes>=0?' pos':'')+'">'+fmtNum(netMes)+'€</div><div class="kpi-sub">'+fmtNum(despMes)+'€ en despeses · '+todayOps+' moviments avui</div></div>'
+    +'</div>';
+
+  var months=[]; for(var i=11;i>=0;i--){ months.push(mesKey(-i)); }
+  var vals=months.map(function(m){ return comp.filter(function(s){ return String(s.data).startsWith(m); }).reduce(function(a,s){ return a+s.preu; },0); });
+  var maxV=Math.max.apply(null,vals.concat([1]));
+  ge('db-bars').innerHTML='<div class="bwrap">'+vals.map(function(v,i){
+    return '<div class="bw" title="'+fmtM(months[i])+': '+fmtNum(v)+'€"><div style="font-size:8px;font-weight:700;color:#0b6e55">'+(v||'')+'</div><div class="bar" style="height:'+Math.round(v/maxV*100)+'px;background:#0b6e55"></div></div>';
+  }).join('')+'</div>';
+  ge('db-blbl').innerHTML=months.map(function(m){ return '<span>'+m.slice(5)+'</span>'; }).join('');
+
+  var upcomingSessions=sessions.filter(function(s){
+    return s.data && s.data>=tdy && s.estat!=='Cancel·lat' && s.estat!=='No presentat';
+  }).sort(function(a,b){
+    var aa=String(a.data||'')+' '+String(a.hora||''), bb=String(b.data||'')+' '+String(b.hora||'');
+    return aa.localeCompare(bb);
+  }).slice(0,5).map(function(s){
+    return {
+      sortKey:String(s.data||'')+' '+String(s.hora||''),
+      title:String(s.client||'Sense client'),
+      sub:fd(s.data)+(s.hora?' · '+s.hora:'')+' · '+String(s.servei||''),
+      val:String(s.terapeuta||'')
+    };
+  });
+  var upcomingRem=reminders.filter(function(r){ return r.data && r.data>=tdy; }).sort(function(a,b){
+    var aa=String(a.data||'')+' '+String(a.hora||''), bb=String(b.data||'')+' '+String(b.hora||'');
+    return aa.localeCompare(bb);
+  }).slice(0,3).map(function(r){
+    return {
+      sortKey:String(r.data||'')+' '+String(r.hora||''),
+      title:String(r.client||'Recordatori'),
+      sub:fd(r.data)+(r.hora?' · '+r.hora:'')+' · '+String(r.descripcio||''),
+      val:String(r.prio||'')
+    };
+  });
+  var nextItems=upcomingSessions.concat(upcomingRem).sort(function(a,b){ return a.sortKey.localeCompare(b.sortKey); }).slice(0,6);
+  ge('db-next').innerHTML=nextItems.length?'<div class="dash-list">'+nextItems.map(function(it){
+    return '<div class="dash-item"><div class="dash-main"><div class="dash-title">'+it.title+'</div><div class="dash-sub">'+it.sub+'</div></div><div class="dash-note">'+it.val+'</div></div>';
+  }).join('')+'</div>':'<div class="dash-empty">No hi ha activitat pròxima.</div>';
+
+  ge('db-pending').innerHTML=pendingAll.length?'<div class="dash-list">'+pendingAll.slice().sort(function(a,b){
+    return String(a.data||'').localeCompare(String(b.data||''));
+  }).slice(0,6).map(function(s){
+    var debt=(s.preu-(s.preu_compte||0));
+    return '<div class="dash-item"><div class="dash-main"><div class="dash-title">'+String(s.client||'')+'</div><div class="dash-sub">'+fd(s.data)+(s.servei?' · '+s.servei:'')+'</div></div><div class="dash-val">'+fmtNum(debt)+'€</div></div>';
+  }).join('')+'</div><div class="mini-note" style="margin-top:10px">'+pendingCount+' registres programats · '+fmtNum(pendingAmt)+'€ pendents</div>':'<div class="dash-empty">No hi ha imports pendents de cobrar.</div>';
+
+  var byClient={}; comp.forEach(function(s){ byClient[s.client]=(byClient[s.client]||0)+s.preu; });
+  var topClients=Object.entries(byClient).sort(function(a,b){ return b[1]-a[1]; }).slice(0,6);
+  ge('db-top-clients').innerHTML=topClients.length?topClients.map(function(e,i){
+    var pct=Math.round(e[1]/(topClients[0][1]||1)*100);
+    return '<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">'+e[0]+'</span><span style="font-weight:700">'+fmtNum(e[1])+'€</span></div><div class="pb"><div class="pf" style="width:'+pct+'%;background:'+COLORS[i%COLORS.length]+'"></div></div></div>';
+  }).join(''):'<div class="dash-empty">Encara no hi ha clients amb ingressos.</div>';
+
+  var bySrv={}; compMes.forEach(function(s){ bySrv[s.servei]=(bySrv[s.servei]||0)+s.preu; });
+  var topSrv=Object.entries(bySrv).sort(function(a,b){ return b[1]-a[1]; }).slice(0,6);
+  ge('db-top-services').innerHTML=topSrv.length?topSrv.map(function(e,i){
+    var pct=Math.round(e[1]/(topSrv[0][1]||1)*100);
+    return '<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">'+e[0]+'</span><span style="font-weight:700">'+fmtNum(e[1])+'€</span></div><div class="pb"><div class="pf" style="width:'+pct+'%;background:'+COLORS[i%COLORS.length]+'"></div></div></div>';
+  }).join(''):'<div class="dash-empty">Aquest mes encara no hi ha serveis completats.</div>';
+
+  var recent=sessions.slice().sort(function(a,b){
+    return (String(b.data||'')+' '+String(b.hora||'')).localeCompare(String(a.data||'')+' '+String(a.hora||''));
+  }).slice(0,8);
+  ge('db-recent').innerHTML=recent.length?'<div class="dash-list">'+recent.map(function(s){
+    return '<div class="dash-item"><div class="dash-main"><div class="dash-title">'+String(s.client||'')+'</div><div class="dash-sub">'+fd(s.data)+(s.hora?' · '+s.hora:'')+' · '+String(s.servei||'')+' · '+String(s.terapeuta||'')+'</div></div><div class="dash-note">'+fixMoji(s.estat||'')+(s.preu>0?' · '+fmtNum(s.preu)+'€':'')+'</div></div>';
+  }).join('')+'</div>':'<div class="dash-empty">Sense activitat recent.</div>';
+}
+
 function drawPagaments(){
   var paid=sessions.filter(function(s){ return s.preu>0&&s.estat==='Completat'; });
   var total=paid.reduce(function(a,s){ return a+s.preu; },0);
@@ -870,7 +1012,7 @@ function drawReminders(){
   }
   el.innerHTML=html;
 }
-function delReminder(id){ reminders=reminders.filter(function(r){ return r.id!==id; }); drawReminders(); }
+function delReminder(id){ reminders=reminders.filter(function(r){ return r.id!==id; }); drawReminders(); refreshDashboardIfVisible(); }
 
 function progBars(elId,entries,total){
   progBarsAmt(elId,entries,total,{});
@@ -1088,7 +1230,7 @@ function doEditSession(){
     }
   }
   if(sbOn) sbUpdate('sessions',id,s);
-  closeM('m-es'); drawSessions(); drawReminders(); drawClients();
+  closeM('m-es'); drawSessions(); drawReminders(); drawClients(); refreshDashboardIfVisible();
 }
 
 function goTo(page,sideEl,mobEl){
@@ -1099,6 +1241,7 @@ function goTo(page,sideEl,mobEl){
   if(sideEl) sideEl.classList.add('on');
   if(mobEl) mobEl.classList.add('on');
   var bni=ge('bni-'+page); if(bni) bni.classList.add('on');
+  if(page==='dashboard') drawDashboard();
   if(page==='pagaments') drawPagaments();
   if(page==='recordatoris') drawReminders();
   if(page==='grafiques') drawGraf();
@@ -1129,7 +1272,7 @@ function doAddClient(){
   var nc={id:nextCid++,nom:display,codi:codi,base:nom,sessions:0,total_gastat:0,primera_visita:td,ultima_visita:td,servei_habitual:srv,categoria_principal:catOf(srv)};
   clients.unshift(nc);
   if(sbOn) sbInsert('clients',nc);
-  cPage=1; drawClients(); closeM('m-nc');
+  cPage=1; drawClients(); closeM('m-nc'); refreshDashboardIfVisible();
   ['cn','cco','cnotes'].forEach(function(id){ var e=ge(id); if(e) e.value=''; });
 }
 
@@ -1143,14 +1286,14 @@ function doAddSession(){
   sessions.unshift(s);
   if(cobj){ cobj.sessions++; if(s.estat==='Completat') cobj.total_gastat+=preu; cobj.ultima_visita=s.data; }
   if(sbOn) sbInsert('sessions',s);
-  sPage=1; drawSessions(); drawClients(); closeM('m-ns');
+  sPage=1; drawSessions(); drawClients(); closeM('m-ns'); refreshDashboardIfVisible();
 }
 
 function doAddReminder(){
   var r={id:nextRid++,client:gv('nrcli-val')||gv('nrcli-search'),data:gv('nrdata'),hora:gv('nrhora'),descripcio:gv('nrdesc'),prio:gv('nrprio')};
   reminders.push(r);
   if(sbOn) sbInsert('recordatoris',r);
-  drawReminders(); closeM('m-nr');
+  drawReminders(); closeM('m-nr'); refreshDashboardIfVisible();
 }
 
 function saveCreds(url,key){ try{ localStorage.setItem('sb_url',url); localStorage.setItem('sb_key',key); }catch(e){} }
@@ -1531,6 +1674,7 @@ async function doEditClient() {
   closeM('m-ec');
   drawClients();
   drawSessions();
+  refreshDashboardIfVisible();
 }
 
 
@@ -1559,6 +1703,7 @@ function doDelSession(id) {
   drawSessions();
   drawClients();
   drawReminders();
+  refreshDashboardIfVisible();
 }
 
 
@@ -1774,6 +1919,7 @@ function doAddDespesa() {
   if(sbOn) sbInsert('despeses', d);
   closeM('m-nd');
   drawDespeses();
+  refreshDashboardIfVisible();
 }
 
 function openEditDespesa(id) {
@@ -1803,6 +1949,7 @@ function doEditDespesa() {
   if(sbOn) sbUpdate('despeses', id, d);
   closeM('m-ed');
   drawDespeses();
+  refreshDashboardIfVisible();
 }
 
 function confirmDelDespesa() {
@@ -1820,6 +1967,7 @@ function confirmDelDespesa() {
   }
   closeM('m-ed');
   drawDespeses();
+  refreshDashboardIfVisible();
 }
 
 
@@ -2043,6 +2191,7 @@ function drawAllYearsChart() {
       nextSid = Math.max.apply(null, sessions.map(function(s){ return s.id || 0; }).concat([0])) + 1;
       drawClients();
       drawSessions();
+      refreshDashboardIfVisible();
       sanitizeDom(document.body);
     }catch(e){
       console.error(e);
@@ -2114,6 +2263,7 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   try{
+    if(typeof drawDashboard === 'function') drawDashboard();
     if(typeof drawClients === 'function') drawClients();
     if(typeof drawSessions === 'function') drawSessions();
     sanitizeDom(document.body);
