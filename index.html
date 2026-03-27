@@ -9,12 +9,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Gestió Clients">
-<meta name="application-name" content="Gestió Clients">
+<meta name="apple-mobile-web-app-title" content="Programa de gestió">
+<meta name="application-name" content="Programa de gestió">
 <meta name="theme-color" content="#0b6e55">
 <link rel="manifest" href="data:application/manifest+json,{
-  %22name%22:%22Gesti%C3%B3%20Clients%22,
-  %22short_name%22:%22Gesti%C3%B3%22,
+  %22name%22:%22Programa%20de%20gesti%C3%B3%22,
+  %22short_name%22:%22CRM%22,
   %22start_url%22:%22./index.html%22,
   %22display%22:%22standalone%22,
   %22background_color%22:%22%23f7f6f3%22,
@@ -22,7 +22,7 @@
   %22orientation%22:%22portrait-primary%22
 }">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Gestio Clients</title>
+<title>Programa de gestio de clients</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,sans-serif;font-size:14px;background:#f7f6f3;color:#1a1a1a}
@@ -175,12 +175,12 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 <body>
 <div class="app">
 <div class="side">
-  <div class="logo">Angela &amp; Carles<small>Massatge Girona</small></div>
+  <div class="logo">CRM Clients<small>Programa de gestió comercial</small></div>
   <div class="nav on" onclick="goTo('clients',this)">&#128101; Clients</div>
-  <div class="nav" onclick="goTo('sessions',this)">&#128197; Cites</div>
-  <div class="nav" onclick="goTo('pagaments',this)">&#128179; Ingressos</div>
-  <div class="nav" onclick="goTo('grafiques',this)">&#128200; Gr&#224;fiques</div>
-  <div class="nav" onclick="goTo('calendari',this)">&#128197; Agenda</div>
+  <div class="nav" onclick="goTo('sessions',this)">&#128197; Activitat</div>
+  <div class="nav" onclick="goTo('pagaments',this)">&#128179; Facturació</div>
+  <div class="nav" onclick="goTo('grafiques',this)">&#128200; Informes</div>
+  <div class="nav" onclick="goTo('calendari',this)">&#128197; Calendari</div>
   <div class="nav" onclick="goTo('despeses',this)">&#128176; Despeses</div>
   <div class="sb-area">
     <div id="dbst" class="dbst dboff">&#9679; Mode local</div>
@@ -196,18 +196,22 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   <div class="ph">
     <div class="pt">Clients <span id="c-cnt" style="font-size:13px;color:#999;font-weight:400"></span></div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-      <input type="text" class="sb" placeholder="Cerca nom o codi WA..." id="c-q" oninput="cPage=1;drawClients()">
+      <input type="text" class="sb" placeholder="Cerca nom o codi de client..." id="c-q" oninput="cPage=1;drawClients()">
       <select class="fs" id="c-cat" onchange="cPage=1;drawClients()">
         <option value="">Totes categories</option>
         <option value="Massatge">Massatge</option>
         <option value="Habitaci&#243; per hores">Habitaci&#243;</option>
         <option value="Habitaci&#243; per dies">Habitaci&#243; per dies</option>
       </select>
-      <button class="btn btnp btns" onclick="openM('m-nc')">+ Nou</button>
+      <button class="btn btnp btns" onclick="openM('m-nc')">+ Nou client</button>
     </div>
   </div>
+  <div class="card" style="background:linear-gradient(135deg,#eef8f5,#f8fbfa);border-color:#d9ebe4">
+    <div style="font-size:15px;font-weight:700;color:#0b6e55;margin-bottom:4px">Base CRM preparada per treballar</div>
+    <div style="font-size:13px;color:#5d6b66;line-height:1.5">Pots registrar clients, guardar activitat, revisar imports, consultar l'historial i adaptar els camps a la teva empresa des d'aquesta mateixa base.</div>
+  </div>
   <div class="card dtbl" style="padding:0;overflow:hidden">
-    <table><thead><tr><th>Client</th><th>Codi WA</th><th>Sessions</th><th>Total</th><th>Servei habitual</th><th>&#218;ltima visita</th><th></th></tr></thead>
+    <table><thead><tr><th>Client</th><th>Codi client</th><th>Operacions</th><th>Total</th><th>L&iacute;nia principal</th><th>Darrera activitat</th><th></th></tr></thead>
     <tbody id="c-tb"></tbody></table>
   </div>
   <div id="c-pg" class="pager dtbl"></div>
@@ -217,13 +221,13 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 
 <div class="page" id="page-sessions">
   <div class="ph">
-    <div class="pt">Cites <span id="s-cnt" style="font-size:13px;color:#999;font-weight:400"></span></div>
-    <button class="btn btnp btns" onclick="openM('m-ns')">+ Nova</button>
+    <div class="pt">Activitat <span id="s-cnt" style="font-size:13px;color:#999;font-weight:400"></span></div>
+    <button class="btn btnp btns" onclick="openM('m-ns')">+ Nou registre</button>
   </div>
   <div style="background:#fff;border:1px solid #e5e3de;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem">
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
       <div class="fg2"><div class="flbl">Client/Codi</div><input type="text" id="sf-q" style="width:130px" oninput="sPage=1;drawSessions()"></div>
-      <div class="fg2"><div class="flbl">Terapeuta</div><select id="sf-ter" class="fs" onchange="sPage=1;drawSessions()"><option value="">Tots</option><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option><option>Habitaci&#243; per Dies</option></select></div>
+      <div class="fg2"><div class="flbl">Responsable</div><select id="sf-ter" class="fs" onchange="sPage=1;drawSessions()"><option value="">Tots</option><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option><option>Habitaci&#243; per Dies</option></select></div>
       <div class="fg2"><div class="flbl">Estat</div><select id="sf-est" class="fs" onchange="sPage=1;drawSessions()"><option value="">Tots</option><option>Completat</option><option>Cancel&#183;lat</option><option>No presentat</option><option>Programat</option></select></div>
       <div class="fg2"><div class="flbl">Servei</div><select id="sf-srv" class="fs" onchange="sPage=1;drawSessions()"><option value="">Tots</option></select></div>
       <div class="fg2"><div class="flbl">Des de</div><input type="date" id="sf-fr" oninput="sPage=1;drawSessions()"></div>
@@ -233,21 +237,21 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     </div>
   </div>
   <div class="card" style="padding:0;overflow-x:auto">
-    <table style="min-width:600px"><thead><tr><th>Data</th><th>Client</th><th>Codi</th><th>Servei</th><th>Preu</th><th>Terapeuta</th><th>Estat</th><th></th></tr></thead>
+    <table style="min-width:600px"><thead><tr><th>Data</th><th>Client</th><th>Codi</th><th>Servei</th><th>Import</th><th>Responsable</th><th>Estat</th><th></th></tr></thead>
     <tbody id="s-tb"></tbody></table>
   </div>
   <div id="s-pg" class="pager"></div>
 </div>
 
 <div class="page" id="page-pagaments">
-  <div class="ph"><div class="pt">Ingressos</div></div>
+  <div class="ph"><div class="pt">Facturació</div></div>
   <div class="mets" id="p-met"></div>
   <div class="g2">
-    <div class="card"><div class="stit">Ingressos mensuals</div><div class="bwrap" id="p-bars"></div><div id="p-blbl" style="display:flex;justify-content:space-between;font-size:9px;color:#bbb;margin-top:3px"></div></div>
-    <div class="card"><div class="stit">M&#232;tode de pagament</div><div id="p-mth"></div></div>
+    <div class="card"><div class="stit">Facturació mensual</div><div class="bwrap" id="p-bars"></div><div id="p-blbl" style="display:flex;justify-content:space-between;font-size:9px;color:#bbb;margin-top:3px"></div></div>
+    <div class="card"><div class="stit">Mètode de cobrament</div><div id="p-mth"></div></div>
   </div>
   <div class="card" style="padding:0;overflow-x:auto">
-    <table style="min-width:600px"><thead><tr><th>Data</th><th>Client</th><th class="thide">Codi</th><th>Servei</th><th>Import</th><th class="thide">M&#232;tode</th><th class="thide">Terapeuta</th></tr></thead>
+    <table style="min-width:600px"><thead><tr><th>Data</th><th>Client</th><th class="thide">Codi</th><th>Servei</th><th>Import</th><th class="thide">Cobrament</th><th class="thide">Responsable</th></tr></thead>
     <tbody id="p-tb"></tbody></table>
   </div>
 </div>
@@ -388,11 +392,11 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 <div class="bnav">
   <div class="bnav-row">
     <div class="bni on" id="bni-clients" onclick="goTo('clients',null,this)"><div class="bni-ic">&#128101;</div>Clients</div>
-    <div class="bni" id="bni-sessions" onclick="goTo('sessions',null,this)"><div class="bni-ic">&#128197;</div>Cites</div>
-    <div class="bni" id="bni-pagaments" onclick="goTo('pagaments',null,this)"><div class="bni-ic">&#128179;</div>Ingressos</div>
+    <div class="bni" id="bni-sessions" onclick="goTo('sessions',null,this)"><div class="bni-ic">&#128197;</div>Activitat</div>
+    <div class="bni" id="bni-pagaments" onclick="goTo('pagaments',null,this)"><div class="bni-ic">&#128179;</div>Facturació</div>
     <div class="bni" id="bni-grafiques" onclick="goTo('grafiques',null,this)"><div class="bni-ic">&#128200;</div>Graf.</div>
     <div class="bni" id="bni-despeses" onclick="goTo('despeses',null,this)"><div class="bni-ic">&#128176;</div>Despeses</div>
-    <div class="bni" id="bni-calendari" onclick="goTo('calendari',null,this)"><div class="bni-ic">&#128197;</div>Agenda</div>
+    <div class="bni" id="bni-calendari" onclick="goTo('calendari',null,this)"><div class="bni-ic">&#128197;</div>Calendari</div>
   </div>
 </div>
 
@@ -401,9 +405,9 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   <div class="mh"><div class="mtt">Nou client</div><button class="xb" onclick="closeM('m-nc')">&#215;</button></div>
   <div class="fg">
     <div><lbl>Nom</lbl><input id="cn" placeholder="Nom complet"></div>
-    <div><lbl>Codi WhatsApp (4 d&#237;gits)</lbl><input id="cco" placeholder="1234" maxlength="4"></div>
-    <div class="ff"><lbl>Servei habitual</lbl><select id="csrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; per dies</option></select></div>
-    <div class="ff"><lbl>Notes</lbl><textarea id="cnotes" rows="2"></textarea></div>
+    <div><lbl>Codi client (4 d&#237;gits)</lbl><input id="cco" placeholder="1234" maxlength="4"></div>
+    <div class="ff"><lbl>L&iacute;nia principal</lbl><select id="csrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; per dies</option></select></div>
+    <div class="ff"><lbl>Notes internes</lbl><textarea id="cnotes" rows="2"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
     <button class="btn btns" onclick="closeM('m-nc')">Cancel&#183;lar</button>
@@ -412,18 +416,18 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 </div></div>
 
 <div class="mo" id="m-ns"><div class="md" style="overflow:visible">
-  <div class="mh"><div class="mtt">Nova cita</div><button class="xb" onclick="closeM('m-ns')">&#215;</button></div>
+  <div class="mh"><div class="mtt">Nou registre d'activitat</div><button class="xb" onclick="closeM('m-ns')">&#215;</button></div>
   <div class="fg">
     <div class="ff"><lbl>Client</lbl><input type="text" id="nscli-search" placeholder="Cerca client..." autocomplete="off" oninput="filterClientList('nscli-search','nscli-list','nscli-val')" onfocus="filterClientList('nscli-search','nscli-list','nscli-val')"><div id="nscli-list" style="display:none;border:1px solid #e5e3de;border-radius:6px;max-height:180px;overflow-y:auto;margin-top:2px;background:#fff"></div><input type="hidden" id="nscli-val"></div>
     <div><lbl>Data</lbl><input id="nsdata" type="date"></div>
     <div><lbl>Hora</lbl><input id="nshora" type="time" value="10:00"></div>
     <div><lbl>Servei</lbl><select id="nssrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Habitaci&#243; per dies</option><option>Camino Santiago</option></select></div>
     <div><lbl>Preu (&#8364;)</lbl><input id="nspreu" type="number" value="80"></div>
-    <div><lbl>Terapeuta</lbl><select id="nster"><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option><option>Habitaci&#243; per Dies</option></select></div>
-    <div><lbl>Pagament</lbl><select id="nspay"><option>Cash</option><option>Bizum</option><option>Credit Card</option><option>Transfer&#232;ncia</option></select></div>
+    <div><lbl>Responsable</lbl><select id="nster"><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option><option>Habitaci&#243; per Dies</option></select></div>
+    <div><lbl>Cobrament</lbl><select id="nspay"><option>Cash</option><option>Bizum</option><option>Credit Card</option><option>Transfer&#232;ncia</option></select></div>
     <div><lbl>Estat</lbl><select id="nsest"><option>Completat</option><option>Programat</option><option>Cancel&#183;lat</option><option>No presentat</option></select></div>
     <div><lbl>Pagat a compte (&#8364;)</lbl><input id="nscompte" type="number" min="0" placeholder="0"></div>
-    <div class="ff"><lbl>Notes</lbl><textarea id="nsnotes" rows="2"></textarea></div>
+    <div class="ff"><lbl>Notes internes</lbl><textarea id="nsnotes" rows="2"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
     <button class="btn btns" onclick="closeM('m-ns')">Cancel&#183;lar</button>
@@ -432,7 +436,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 </div></div>
 
 <div class="mo" id="m-nr"><div class="md" style="overflow:visible">
-  <div class="mh"><div class="mtt">Nova cita</div><button class="xb" onclick="closeM('m-nr')">&#215;</button></div>
+  <div class="mh"><div class="mtt">Nou recordatori</div><button class="xb" onclick="closeM('m-nr')">&#215;</button></div>
   <div class="fg">
     <div class="ff"><lbl>Client</lbl><input type="text" id="nrcli-search" placeholder="Cerca client..." autocomplete="off" oninput="filterClientList('nrcli-search','nrcli-list','nrcli-val')" onfocus="filterClientList('nrcli-search','nrcli-list','nrcli-val')"><div id="nrcli-list" style="display:none;border:1px solid #e5e3de;border-radius:6px;max-height:180px;overflow-y:auto;margin-top:2px;background:#fff"></div><input type="hidden" id="nrcli-val"></div>
     <div><lbl>Data</lbl><input id="nrdata" type="date"></div>
@@ -447,7 +451,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 </div></div>
 
 <div class="mo" id="m-es"><div class="md">
-  <div class="mh"><div class="mtt">Editar cita</div><button class="xb" onclick="closeM('m-es')">&#215;</button></div>
+  <div class="mh"><div class="mtt">Editar registre</div><button class="xb" onclick="closeM('m-es')">&#215;</button></div>
   <input type="hidden" id="es-id">
   <div class="fg">
     <div class="ff"><lbl>Client</lbl><input id="es-cli" readonly style="background:#f7f6f3;color:#888"></div>
@@ -455,11 +459,11 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div><lbl>Data</lbl><input id="es-data" type="date"></div>
     <div><lbl>Hora</lbl><input id="es-hora" type="time"></div>
     <div><lbl>Preu (&#8364;)</lbl><input id="es-preu" type="number"></div>
-    <div><lbl>Pagament</lbl><select id="es-pay"><option>Cash</option><option>Bizum</option><option>Credit Card</option><option>Transfer&#232;ncia</option></select></div>
+    <div><lbl>Cobrament</lbl><select id="es-pay"><option>Cash</option><option>Bizum</option><option>Credit Card</option><option>Transfer&#232;ncia</option></select></div>
     <div><lbl>Estat</lbl><select id="es-est"><option>Completat</option><option>Programat</option><option>Cancel&#183;lat</option><option>No presentat</option></select></div>
-    <div><lbl>Terapeuta</lbl><select id="es-ter"><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option><option>Habitaci&#243; per Dies</option></select></div>
+    <div><lbl>Responsable</lbl><select id="es-ter"><option>Carles</option><option>Angela</option><option>Angela &amp; Carles</option><option>Habitaci&#243; per Hores</option><option>Habitaci&#243; per Dies</option></select></div>
     <div><lbl>Pagat a compte (&#8364;)</lbl><input id="es-compte" type="number" min="0" placeholder="0"></div>
-    <div class="ff"><lbl>Notes</lbl><textarea id="es-notes" rows="2"></textarea></div>
+    <div class="ff"><lbl>Notes internes</lbl><textarea id="es-notes" rows="2"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:space-between;margin-top:1.25rem">
     <button class="btn btns" style="color:#c0392b" onclick="confirmDelSession()">&#128465; Eliminar</button>
@@ -844,7 +848,7 @@ function mesCard(key,data,label,elId){
 function drawGraf(){
   var gd=filtG(), comp=gd.filter(function(s){ return s.estat==='Completat'; });
   var ing=comp.reduce(function(a,s){ return a+s.preu; },0), nC=comp.length;
-  ge('g-met').innerHTML='<div class="met"><div class="mv">'+gd.length+'</div><div class="ml">Sessions</div></div>'
+  ge('g-met').innerHTML='<div class="met"><div class="mv">'+gd.length+'</div><div class="ml">Operacions</div></div>'
     +'<div class="met"><div class="mv">'+fmtNum(ing)+'€</div><div class="ml">Ingressos</div></div>'
     +'<div class="met"><div class="mv">'+nC+'</div><div class="ml">Completades</div></div>'
     +'<div class="met"><div class="mv">'+(nC>0?Math.round(ing/nC):0)+'€</div><div class="ml">Tiquet mitjà</div></div>';
@@ -901,14 +905,14 @@ function showDetById(id){
   ge('det-nom').textContent=c.nom;
   ge('det-sub').innerHTML=String(c.servei_habitual||'')+' · '+cs.length+' sessions · '+fmtNum(totalG)+'€'+(c.codi?' <span class="ctag">'+c.codi+'</span>':'');
   ge('det-body').innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1rem">'
-    +'<div class="met"><div class="mv" style="font-size:18px">'+cs.length+'</div><div class="ml">Sessions</div></div>'
+    +'<div class="met"><div class="mv" style="font-size:18px">'+cs.length+'</div><div class="ml">Operacions</div></div>'
     +'<div class="met"><div class="mv" style="font-size:18px">'+fmtNum(totalG)+'€</div><div class="ml">Total</div></div>'
-    +'<div class="met"><div class="mv" style="font-size:13px">'+fd(c.primera_visita)+'</div><div class="ml">1a visita</div></div></div>'
+    +'<div class="met"><div class="mv" style="font-size:13px">'+fd(c.primera_visita)+'</div><div class="ml">Alta inicial</div></div></div>'
     +(c.telefon||c.poblacio?'<div style="background:#f7f6f3;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:13px;display:flex;gap:1rem;flex-wrap:wrap">'
     +(c.telefon?'<div><span style="color:#aaa;font-size:11px;font-weight:700;text-transform:uppercase">Tel&egrave;fon</span><br><a href="tel:'+c.telefon+'" style="color:#0b6e55;font-weight:600">'+c.telefon+'</a></div>':'')
     +(c.poblacio?'<div><span style="color:#aaa;font-size:11px;font-weight:700;text-transform:uppercase">Poblaci&oacute;</span><br><span style="font-weight:600">'+c.poblacio+'</span></div>':'')
     +'</div>':'')
-    +'<div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Historial</div>'
+    +'<div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Historial d'activitat</div>'
     +'<div class="tl">'+cs.slice(0,25).map(function(s){
       return '<div class="ti"><div class="tdot"></div><div class="tc"><div style="font-size:13px;font-weight:600">'+s.servei+'</div>'
         +'<div class="tdt">'+fd(s.data)+' '+(s.hora||'')+' · '+(s.preu>0?s.preu+'€':'—')+' · '+s.terapeuta+(s.pagament?' · '+s.pagament:'')+'</div>'
@@ -1773,11 +1777,11 @@ function drawAllYearsChart() {
   <input type="hidden" id="ec-id">
   <div class="fg">
     <div><lbl>Nom</lbl><input id="ec-nom" placeholder="Nom complet"></div>
-    <div><lbl>Codi WhatsApp (4 d&#237;gits)</lbl><input id="ec-codi" placeholder="1234" maxlength="4" style="font-family:monospace"></div>
+    <div><lbl>Codi client (4 d&#237;gits)</lbl><input id="ec-codi" placeholder="1234" maxlength="4" style="font-family:monospace"></div>
     <div><lbl>Tel&#232;fon</lbl><input id="ec-tel" placeholder="+34 6xx xxx xxx" type="tel"></div>
     <div><lbl>Poblaci&#243;</lbl><input id="ec-pob" placeholder="Girona, Barcelona..."></div>
-    <div class="ff"><lbl>Servei habitual</lbl><select id="ec-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Habitaci&#243; per dies</option></select></div>
-    <div class="ff"><lbl>Notes</lbl><textarea id="ec-notes-c" rows="2"></textarea></div>
+    <div class="ff"><lbl>L&iacute;nia principal</lbl><select id="ec-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Habitaci&#243; per dies</option></select></div>
+    <div class="ff"><lbl>Notes internes</lbl><textarea id="ec-notes-c" rows="2"></textarea></div>
   </div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
     <button class="btn btns" onclick="closeM('m-ec')">Cancel&#183;lar</button>
