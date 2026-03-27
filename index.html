@@ -975,25 +975,20 @@ function drawGraf(){
   if(fc2) evoBase=evoBase.filter(function(s){ return s.categoria===fc2; });
   if(fs2) evoBase=evoBase.filter(function(s){ return s.servei===fs2; });
   var evoIng=evoMonths.map(function(mm){ return evoBase.filter(function(s){ return String(s.data).startsWith(mm)&&s.estat==='Completat'; }).reduce(function(a,s){ return a+s.preu; },0); });
-  var evoDes=evoMonths.map(function(mm){ return despeses.filter(function(d){ return String(d.data).startsWith(mm); }).reduce(function(a,d){ return a+(d.preu||0); },0); });
-  var maxE=Math.max.apply(null,evoIng.concat(evoDes).concat([1]));
+  var maxE=Math.max.apply(null,evoIng.concat([1]));
   var wrapEl=ge('g-evbars-wrap');
   if(wrapEl){
-    wrapEl.innerHTML='<div style="display:flex;gap:12px;margin-bottom:10px;font-size:11px;flex-wrap:wrap">'
-      +'<span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;background:#0b6e55;border-radius:2px"></span>Ingressos</span>'
-      +'</div>'
-      +'<div style="display:flex;gap:10px;align-items:flex-end;overflow-x:auto;padding:8px 2px 10px">'
+    wrapEl.innerHTML='<div class="bwrap">'
       +evoMonths.map(function(mm,i){
         var ingMes=evoIng[i];
-        var ingH=Math.max(ingMes>0?18:0,Math.round(ingMes/maxE*120));
-        return '<div class="bw" style="min-width:64px;flex:0 0 64px" title="'+fmtM(mm)+' · '+fmtNum(ingMes)+'€">'
-          +'<div style="display:flex;align-items:flex-end;justify-content:center;height:124px">'
-          +'<div style="width:38px;background:#0b6e55;border-radius:10px 10px 0 0;height:'+ingH+'px"></div>'
-          +'</div>'
-          +'<div style="margin-top:8px;font-size:10px;color:#5f6d66;text-align:center;font-weight:700">'+fmtNum(ingMes)+'€</div>'
-          +'<div style="font-size:9px;color:#9aa29d;text-align:center;margin-top:3px">'+mm.slice(5)+'</div>'
+        return '<div class="bw" title="'+fmtM(mm)+': '+fmtNum(ingMes)+'€">'
+          +'<div style="font-size:8px;font-weight:700;color:#0b6e55">'+(ingMes||'')+'</div>'
+          +'<div class="bar" style="height:'+Math.round(ingMes/maxE*100)+'px;background:#0b6e55"></div>'
           +'</div>';
       }).join('')
+      +'</div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:9px;color:#bbb;margin-top:3px">'
+      +evoMonths.map(function(m){ return '<span>'+m.slice(5)+'</span>'; }).join('')
       +'</div>';
   }
   var catMap={}, srvMap={}, terCount={}, terAmt={};
