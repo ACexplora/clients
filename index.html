@@ -1642,11 +1642,12 @@ async function doEditClient() {
   }
   if(sbOn && sbUrl && sbKey) {
     try {
-      await fetch(sbUrl+'/rest/v1/clients?id=eq.'+id, {
+      var resp = await fetch(sbUrl+'/rest/v1/clients?id=eq.'+id, {
         method:'PATCH',
         headers:{'Content-Type':'application/json','apikey':sbKey,'Authorization':'Bearer '+sbKey,'Prefer':'return=minimal'},
-        body:JSON.stringify(c)
+        body:JSON.stringify(normalizeSbRow('clients', c))
       });
+      if(!resp.ok) console.error('sbUpdate client failed', await sbReadError(resp));
     } catch(e) { console.error('sbUpdate client error', e); }
   }
   if(btn) btn.textContent = 'Desar canvis';
