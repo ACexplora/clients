@@ -471,6 +471,11 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
   <div class="fg">
     <div><lbl>Nom</lbl><input id="cn" placeholder="Nom complet"></div>
     <div><lbl>Codi client (4 d&#237;gits)</lbl><input id="cco" placeholder="1234" maxlength="4"></div>
+    <div><lbl>Tel&#232;fon</lbl><input id="ctel" placeholder="+34 6xx xxx xxx" type="tel"></div>
+    <div><lbl>Email</lbl><input id="cemail" placeholder="client@email.com" type="email"></div>
+    <div><lbl>Poblaci&#243;</lbl><input id="cpob" placeholder="Girona, Barcelona..."></div>
+    <div><lbl>Data naixement</lbl><input id="cbirth" type="date"></div>
+    <div><lbl>Proced&egrave;ncia</lbl><select id="corigen"><option value="">Sense indicar</option><option>Recomanació</option><option>Google</option><option>X</option><option>Instagram</option><option>Altres</option></select></div>
     <div class="ff"><lbl>L&iacute;nia principal</lbl><select id="csrv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; per dies</option></select></div>
     <div class="ff"><lbl>Notes internes</lbl><textarea id="cnotes" rows="2"></textarea></div>
   </div>
@@ -1168,14 +1173,24 @@ function showDetById(id){
   ge('det-av').textContent=ini(c.nom);
   ge('det-nom').textContent=c.nom;
   ge('det-sub').innerHTML=String(c.servei_habitual||'')+' Â· '+cs.length+' sessions Â· '+fmtNum(totalG)+'â‚¬'+(c.codi?' <span class="ctag">'+c.codi+'</span>':'');
+  var infoHtml='';
+  var infoItems = [
+    c.telefon?'<div><span style="color:#aaa;font-size:11px;font-weight:700;text-transform:uppercase">Tel&egrave;fon</span><br><a href="tel:'+c.telefon+'" style="color:#0b6e55;font-weight:600">'+c.telefon+'</a></div>':'',
+    c.email?'<div><span style="color:#aaa;font-size:11px;font-weight:700;text-transform:uppercase">Email</span><br><a href="mailto:'+c.email+'" style="color:#0b6e55;font-weight:600">'+c.email+'</a></div>':'',
+    c.poblacio?'<div><span style="color:#aaa;font-size:11px;font-weight:700;text-transform:uppercase">Poblaci&oacute;</span><br><span style="font-weight:600">'+c.poblacio+'</span></div>':'',
+    c.procedencia?'<div><span style="color:#aaa;font-size:11px;font-weight:700;text-transform:uppercase">Proced&egrave;ncia</span><br><span style="font-weight:600">'+c.procedencia+'</span></div>':'',
+    c.data_naixement?'<div><span style="color:#aaa;font-size:11px;font-weight:700;text-transform:uppercase">Data naixement</span><br><span style="font-weight:600">'+fd(c.data_naixement)+'</span></div>':''
+  ].filter(Boolean);
+  if(infoItems.length){
+    infoHtml='<div style="background:#f7f6f3;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:13px;display:flex;gap:1rem;flex-wrap:wrap">'+infoItems.join('')+'</div>';
+  }
+  var notesHtml = c.notes?'<div style="background:#fff8e8;border:1px solid #f3ddab;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem"><div style="font-size:11px;color:#9a7b14;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Notes internes</div><div style="font-size:13px;color:#5d4d2a;white-space:pre-wrap">'+c.notes+'</div></div>':'';
   ge('det-body').innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1rem">'
     +'<div class="met"><div class="mv" style="font-size:18px">'+cs.length+'</div><div class="ml">Operacions</div></div>'
     +'<div class="met"><div class="mv" style="font-size:18px">'+fmtNum(totalG)+'â‚¬</div><div class="ml">Total</div></div>'
     +'<div class="met"><div class="mv" style="font-size:13px">'+fd(c.primera_visita)+'</div><div class="ml">Alta inicial</div></div></div>'
-    +(c.telefon||c.poblacio?'<div style="background:#f7f6f3;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:13px;display:flex;gap:1rem;flex-wrap:wrap">'
-    +(c.telefon?'<div><span style="color:#aaa;font-size:11px;font-weight:700;text-transform:uppercase">Tel&egrave;fon</span><br><a href="tel:'+c.telefon+'" style="color:#0b6e55;font-weight:600">'+c.telefon+'</a></div>':'')
-    +(c.poblacio?'<div><span style="color:#aaa;font-size:11px;font-weight:700;text-transform:uppercase">Poblaci&oacute;</span><br><span style="font-weight:600">'+c.poblacio+'</span></div>':'')
-    +'</div>':'')
+    +infoHtml
+    +notesHtml
     +'<div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Historial d&#39;activitat</div>'
     +'<div class="tl">'+cs.slice(0,25).map(function(s){
       return '<div class="ti"><div class="tdot"></div><div class="tc"><div style="font-size:13px;font-weight:600">'+s.servei+'</div>'
@@ -1261,12 +1276,12 @@ function doAddClient(){
   var nom=(gv('cn')||'').trim(); if(!nom) return;
   var codi=(gv('cco')||'').trim(), srv=gv('csrv'), td=today();
   var display=codi?nom+' '+codi:nom;
-  var nc={id:nextCid++,nom:display,codi:codi,base:nom,sessions:0,total_gastat:0,primera_visita:td,ultima_visita:td,servei_habitual:srv,categoria_principal:catOf(srv)};
+  var nc={id:nextCid++,nom:display,codi:codi,base:nom,sessions:0,total_gastat:0,primera_visita:td,ultima_visita:td,servei_habitual:srv,categoria_principal:catOf(srv),telefon:(gv('ctel')||'').trim()||null,email:(gv('cemail')||'').trim()||null,poblacio:(gv('cpob')||'').trim()||null,data_naixement:gv('cbirth')||null,procedencia:gv('corigen')||null,notes:(gv('cnotes')||'').trim()||null};
   clients.unshift(nc);
   if(sbOn) sbInsert('clients',nc);
   saveLocalBackup(true);
   cPage=1; drawClients(); closeM('m-nc'); refreshDashboardIfVisible();
-  ['cn','cco','cnotes'].forEach(function(id){ var e=ge(id); if(e) e.value=''; });
+  ['cn','cco','ctel','cemail','cpob','cbirth','corigen','cnotes'].forEach(function(id){ var e=ge(id); if(e) e.value=''; });
 }
 
 function doAddSession(){
@@ -1447,7 +1462,10 @@ async function loadFromSb(){
         var local=localMap[c.id];
         if(local){
           if(!c.telefon && local.telefon) c.telefon=local.telefon;
+          if(!c.email && local.email) c.email=local.email;
           if(!c.poblacio && local.poblacio) c.poblacio=local.poblacio;
+          if(!c.data_naixement && local.data_naixement) c.data_naixement=local.data_naixement;
+          if(!c.procedencia && local.procedencia) c.procedencia=local.procedencia;
           if(!c.notes && local.notes) c.notes=local.notes;
         }
       });
@@ -1717,7 +1735,10 @@ function openEditClient(id) {
   ge('ec-nom').value = nomBase;
   ge('ec-codi').value = c.codi || '';
   ge('ec-tel').value = c.telefon || '';
+  var emailEl = ge('ec-email'); if(emailEl) emailEl.value = c.email || '';
   var pobEl = ge('ec-pob'); if(pobEl) pobEl.value = c.poblacio || '';
+  var birthEl = ge('ec-birth'); if(birthEl) birthEl.value = c.data_naixement || '';
+  var origenEl = ge('ec-origen'); if(origenEl) origenEl.value = c.procedencia || '';
   var notEl = ge('ec-notes-c'); if(notEl) notEl.value = c.notes || '';
   var srvEl = ge('ec-srv'); if(srvEl) srvEl.value = c.servei_habitual || 'Tantra Energy';
   c._oldNom = c.nom; // remember old name for session update
@@ -1737,7 +1758,10 @@ async function doEditClient() {
   c.codi    = codi;
   c.nom     = codi ? nom + ' ' + codi : nom;
   c.telefon = (gv('ec-tel')||'').trim() || null;
+  c.email   = (gv('ec-email')||'').trim() || null;
   c.poblacio = ge('ec-pob') ? (ge('ec-pob').value.trim() || null) : null;
+  c.data_naixement = gv('ec-birth') || null;
+  c.procedencia = gv('ec-origen') || null;
   c.notes   = ge('ec-notes-c') ? (ge('ec-notes-c').value.trim() || null) : null;
   c.servei_habitual = gv('ec-srv');
   c.categoria_principal = catOf(c.servei_habitual);
@@ -2162,7 +2186,10 @@ function drawAllYearsChart() {
     <div><lbl>Nom</lbl><input id="ec-nom" placeholder="Nom complet"></div>
     <div><lbl>Codi client (4 d&#237;gits)</lbl><input id="ec-codi" placeholder="1234" maxlength="4" style="font-family:monospace"></div>
     <div><lbl>Tel&#232;fon</lbl><input id="ec-tel" placeholder="+34 6xx xxx xxx" type="tel"></div>
+    <div><lbl>Email</lbl><input id="ec-email" placeholder="client@email.com" type="email"></div>
     <div><lbl>Poblaci&#243;</lbl><input id="ec-pob" placeholder="Girona, Barcelona..."></div>
+    <div><lbl>Data naixement</lbl><input id="ec-birth" type="date"></div>
+    <div><lbl>Proced&egrave;ncia</lbl><select id="ec-origen"><option value="">Sense indicar</option><option>Recomanació</option><option>Google</option><option>X</option><option>Instagram</option><option>Altres</option></select></div>
     <div class="ff"><lbl>L&iacute;nia principal</lbl><select id="ec-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californi&#224;</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitaci&#243; 1h</option><option>Habitaci&#243; 1h 30 min</option><option>Habitaci&#243; 2h</option><option>Habitaci&#243; 3h</option><option>Habitaci&#243; +3h</option><option>Habitaci&#243; per dies</option></select></div>
     <div class="ff"><lbl>Notes internes</lbl><textarea id="ec-notes-c" rows="2"></textarea></div>
   </div>
@@ -2174,7 +2201,7 @@ function drawAllYearsChart() {
 <script>
 (function(){
   var SB_FIELDS = {
-    clients: ['id','nom','codi','base','sessions','total_gastat','primera_visita','ultima_visita','servei_habitual','categoria_principal','telefon','poblacio','notes'],
+    clients: ['id','nom','codi','base','sessions','total_gastat','primera_visita','ultima_visita','servei_habitual','categoria_principal','telefon','email','poblacio','data_naixement','procedencia','notes'],
     sessions: ['id','data','hora','servei','categoria','preu','preu_compte','client','codi','client_base','terapeuta','notes','estat','pagament'],
     recordatoris: ['id','client','data','hora','descripcio','prio'],
     despeses: ['id','data','preu','categoria','producte','notes']
@@ -2341,7 +2368,10 @@ function drawAllYearsChart() {
           var local = localMap[c.id];
           if(local){
             if(!c.telefon && local.telefon) c.telefon = local.telefon;
+            if(!c.email && local.email) c.email = local.email;
             if(!c.poblacio && local.poblacio) c.poblacio = local.poblacio;
+            if(!c.data_naixement && local.data_naixement) c.data_naixement = local.data_naixement;
+            if(!c.procedencia && local.procedencia) c.procedencia = local.procedencia;
             if(!c.notes && local.notes) c.notes = local.notes;
           }
         });
