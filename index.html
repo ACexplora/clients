@@ -2048,6 +2048,13 @@ function drawAllYearsChart() {
 </div></div>
 <script>
 (function(){
+  var SB_FIELDS = {
+    clients: ['id','nom','codi','base','sessions','total_gastat','primera_visita','ultima_visita','servei_habitual','categoria_principal','telefon','poblacio','notes'],
+    sessions: ['id','data','hora','servei','categoria','preu','preu_compte','client','codi','client_base','terapeuta','notes','estat','pagament'],
+    recordatoris: ['id','client','data','hora','descripcio','prio'],
+    despeses: ['id','data','preu','categoria','producte','notes']
+  };
+
   function sbHeadersV2(extra){
     var h = { apikey: sbKey, Authorization: 'Bearer ' + sbKey };
     if(extra) for(var k in extra) h[k] = extra[k];
@@ -2060,6 +2067,11 @@ function drawAllYearsChart() {
       out[k] = (Object.prototype.hasOwnProperty.call(row, k) && row[k] !== undefined) ? row[k] : null;
     });
     return out;
+  }
+
+  function normalizeSbRow(table, row){
+    var fields = SB_FIELDS[table];
+    return fields ? pickSbFields(row || {}, fields) : row;
   }
 
   async function sbReadError(res){
@@ -2096,12 +2108,27 @@ function drawAllYearsChart() {
     }
   }
 
+  async function sbCountRowsV2(table){
+    try{
+      var r = await fetch(sbUrl + '/rest/v1/' + table + '?select=id', {
+        headers: sbHeadersV2({ Prefer: 'count=exact' })
+      });
+      if(!r.ok) return null;
+      var cnt = r.headers.get('content-range') || '';
+      var m = /\/(\d+)$/.exec(cnt);
+      return m ? parseInt(m[1], 10) : null;
+    }catch(e){
+      console.error(e);
+      return null;
+    }
+  }
+
   window.sbInsert = function(table,row){
     if(!sbUrl || !sbKey) return;
     fetch(sbUrl + '/rest/v1/' + table, {
       method: 'POST',
       headers: sbHeadersV2({ 'Content-Type': 'application/json', Prefer: 'return=minimal' }),
-      body: JSON.stringify(row)
+      body: JSON.stringify(normalizeSbRow(table, row))
     }).catch(function(e){ console.error(e); });
   };
 
@@ -2110,16 +2137,14 @@ function drawAllYearsChart() {
     fetch(sbUrl + '/rest/v1/' + table + '?id=eq.' + id, {
       method: 'PATCH',
       headers: sbHeadersV2({ 'Content-Type': 'application/json', Prefer: 'return=minimal' }),
-      body: JSON.stringify(row)
+      body: JSON.stringify(normalizeSbRow(table, row))
     }).catch(function(e){ console.error(e); });
   };
 
   window.importToSb = async function(){
     var bs = 100;
-    var clientFields = ['id','nom','codi','base','sessions','total_gastat','primera_visita','ultima_visita','servei_habitual','categoria_principal','telefon','poblacio','notes'];
-    var sessionFields = ['id','data','hora','servei','categoria','preu','preu_compte','client','codi','client_base','terapeuta','notes','estat','pagament'];
     for(var i=0;i<ALLCLIENTS.length;i+=bs){
-      var clientBatch = ALLCLIENTS.slice(i, i + bs).map(function(c){ return pickSbFields(c, clientFields); });
+      var clientBatch = ALLCLIENTS.slice(i, i + bs).map(function(c){ return normalizeSbRow('clients', c); });
       var rc = await fetch(sbUrl + '/rest/v1/clients', {
         method: 'POST',
         headers: sbHeadersV2({ 'Content-Type': 'application/json', Prefer: 'resolution=ignore-duplicates' }),
@@ -2128,7 +2153,7 @@ function drawAllYearsChart() {
       if(!rc.ok) throw new Error('No s han pogut importar els clients (' + await sbReadError(rc) + ')');
     }
     for(var j=0;j<ALLSESSIONS.length;j+=bs){
-      var sessionBatch = ALLSESSIONS.slice(j, j + bs).map(function(s){ return pickSbFields(s, sessionFields); });
+      var sessionBatch = ALLSESSIONS.slice(j, j + bs).map(function(s){ return normalizeSbRow('sessions', s); });
       var rs = await fetch(sbUrl + '/rest/v1/sessions', {
         method: 'POST',
         headers: sbHeadersV2({ 'Content-Type': 'application/json', Prefer: 'resolution=ignore-duplicates' }),
@@ -2198,8 +2223,13 @@ function drawAllYearsChart() {
         sbMsg('Connexio OK, pero falten taules: ' + missing.join(', ') + '.', false);
         return;
       }
-      sbMsg('Connexio OK. Important dades...', true);
-      await window.importToSb();
+      var rowCount = await sbCountRowsV2('clients');
+      if(rowCount === 0){
+        sbMsg('Connexio OK. Important dades inicials...', true);
+        await window.importToSb();
+      }else{
+        sbMsg('Connexio OK. Carregant dades...', true);
+      }
       await window.loadFromSb();
       closeM('m-sb');
     }catch(e){
