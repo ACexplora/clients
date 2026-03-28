@@ -2057,7 +2057,7 @@ function drawAllYearsChart() {
   function pickSbFields(row, fields){
     var out = {};
     fields.forEach(function(k){
-      if(Object.prototype.hasOwnProperty.call(row, k) && row[k] !== undefined) out[k] = row[k];
+      out[k] = (Object.prototype.hasOwnProperty.call(row, k) && row[k] !== undefined) ? row[k] : null;
     });
     return out;
   }
