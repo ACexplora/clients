@@ -1642,12 +1642,8 @@ async function doEditClient() {
   }
   if(sbOn && sbUrl && sbKey) {
     try {
-      var resp = await fetch(sbUrl+'/rest/v1/clients?id=eq.'+id, {
-        method:'PATCH',
-        headers:{'Content-Type':'application/json','apikey':sbKey,'Authorization':'Bearer '+sbKey,'Prefer':'return=minimal'},
-        body:JSON.stringify(normalizeSbRow('clients', c))
-      });
-      if(!resp.ok) console.error('sbUpdate client failed', await sbReadError(resp));
+      var resp = await window.sbUpdate('clients', id, c);
+      if(resp && !resp.ok) console.error('sbUpdate client failed', await window.sbReadError(resp));
     } catch(e) { console.error('sbUpdate client error', e); }
   }
   if(btn) btn.textContent = 'Desar canvis';
@@ -2084,6 +2080,8 @@ function drawAllYearsChart() {
     }
   }
 
+  window.sbReadError = sbReadError;
+
   async function sbCheckProjectV2(url, key){
     var r = await fetch(url + '/auth/v1/settings', { headers: { apikey: key } });
     if(!r.ok) throw new Error('Projecte o clau no valids (' + r.status + ')');
@@ -2124,9 +2122,11 @@ function drawAllYearsChart() {
     }
   }
 
+  window.normalizeSbRow = normalizeSbRow;
+
   window.sbInsert = function(table,row){
     if(!sbUrl || !sbKey) return;
-    fetch(sbUrl + '/rest/v1/' + table, {
+    return fetch(sbUrl + '/rest/v1/' + table, {
       method: 'POST',
       headers: sbHeadersV2({ 'Content-Type': 'application/json', Prefer: 'return=minimal' }),
       body: JSON.stringify(normalizeSbRow(table, row))
@@ -2135,7 +2135,7 @@ function drawAllYearsChart() {
 
   window.sbUpdate = function(table,id,row){
     if(!sbUrl || !sbKey) return;
-    fetch(sbUrl + '/rest/v1/' + table + '?id=eq.' + id, {
+    return fetch(sbUrl + '/rest/v1/' + table + '?id=eq.' + id, {
       method: 'PATCH',
       headers: sbHeadersV2({ 'Content-Type': 'application/json', Prefer: 'return=minimal' }),
       body: JSON.stringify(normalizeSbRow(table, row))
