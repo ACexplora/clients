@@ -215,6 +215,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 <div class="side">
   <div class="logo">CRM Clients<small>Programa de gestió comercial</small></div>
   <div class="nav on" onclick="goTo('dashboard',this)">&#127968; Dashboard</div>
+  <div class="nav" onclick="goTo('comercial',this)">&#128172; Comercial</div>
   <div class="nav" onclick="goTo('clients',this)">&#128101; Clients</div>
   <div class="nav" onclick="goTo('sessions',this)">&#128197; Activitat</div>
   <div class="nav" onclick="goTo('pagaments',this)">&#128179; Facturació</div>
@@ -256,6 +257,32 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div class="card"><div class="stit">Top clients</div><div id="db-top-clients"></div></div>
     <div class="card"><div class="stit">Top serveis</div><div id="db-top-services"></div></div>
   </div>
+</div>
+
+<div class="page" id="page-comercial">
+  <div class="ph">
+    <div class="pt">Comercial <span id="l-cnt" style="font-size:13px;color:#999;font-weight:400"></span></div>
+    <button class="btn btnp btns" onclick="openLeadModal()">+ Nou contacte</button>
+  </div>
+  <div class="card" style="background:linear-gradient(135deg,#fff8e8,#f8fbfa);border-color:#ece4cc">
+    <div style="font-size:15px;font-weight:700;color:#9a7b14;margin-bottom:4px">Seguiment comercial pendent</div>
+    <div style="font-size:13px;color:#6b6250;line-height:1.5">Guarda aquí la gent que ha demanat informació, està pendent de decidir o espera disponibilitat. Des d'aquesta pantalla podràs fer seguiment sense barrejar-los amb els clients ja tancats.</div>
+  </div>
+  <div id="l-met" class="mets"></div>
+  <div class="fbar">
+    <div class="fg2"><div class="flbl">Nom / contacte</div><input type="text" id="lf-q" style="width:180px" oninput="lPage=1;drawLeads()"></div>
+    <div class="fg2"><div class="flbl">Estat</div><select id="lf-est" class="fs" onchange="lPage=1;drawLeads()"><option value="">Tots</option><option>Nou contacte</option><option>Informació enviada</option><option>Interessat</option><option>Pendent de decidir</option><option>Pendent de disponibilitat</option><option>Reserva confirmada</option><option>Perdut</option><option>No interessat</option></select></div>
+    <div class="fg2"><div class="flbl">Procedència</div><select id="lf-org" class="fs" onchange="lPage=1;drawLeads()"><option value="">Totes</option><option>Recomanació</option><option>Google</option><option>X</option><option>Instagram</option><option>Altres</option></select></div>
+    <div class="fg2"><div class="flbl">Seguiment</div><select id="lf-seg" class="fs" onchange="lPage=1;drawLeads()"><option value="">Tots</option><option value="today">Avui</option><option value="pending">Pendents</option><option value="future">Pròxims</option></select></div>
+    <button class="btn btns" onclick="clearLeadFilters()">Netejar</button>
+  </div>
+  <div class="card dtbl" style="padding:0;overflow:hidden">
+    <table><thead><tr><th>Contacte</th><th>Servei</th><th>Estat</th><th>Procedència</th><th>Proper seguiment</th><th>Darrera acció</th><th></th></tr></thead>
+    <tbody id="l-tb"></tbody></table>
+  </div>
+  <div id="l-pg" class="pager dtbl"></div>
+  <div class="cc-list" id="lc"></div>
+  <div id="l-pg-mob" class="pager" style="display:none"></div>
 </div>
 
 <div class="page" id="page-clients">
@@ -459,6 +486,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 <div class="bnav">
   <div class="bnav-row">
     <div class="bni on" id="bni-dashboard" onclick="goTo('dashboard',null,this)"><div class="bni-ic">&#127968;</div>Inici</div>
+    <div class="bni" id="bni-comercial" onclick="goTo('comercial',null,this)"><div class="bni-ic">&#128172;</div>Com.</div>
     <div class="bni" id="bni-clients" onclick="goTo('clients',null,this)"><div class="bni-ic">&#128101;</div>Clients</div>
     <div class="bni" id="bni-sessions" onclick="goTo('sessions',null,this)"><div class="bni-ic">&#128197;</div>Activitat</div>
     <div class="bni" id="bni-pagaments" onclick="goTo('pagaments',null,this)"><div class="bni-ic">&#128179;</div>Facturació</div>
@@ -468,6 +496,30 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 </div>
 
 <!-- MODALS -->
+<div class="mo" id="m-lead"><div class="md">
+  <div class="mh"><div class="mtt" id="lead-title">Nou contacte comercial</div><button class="xb" onclick="closeM('m-lead')">&#215;</button></div>
+  <input type="hidden" id="lead-id">
+  <div class="fg">
+    <div><lbl>Nom</lbl><input id="lead-nom" placeholder="Nom o referència"></div>
+    <div><lbl>Telèfon</lbl><input id="lead-tel" placeholder="+34 6xx xxx xxx" type="tel"></div>
+    <div><lbl>Email</lbl><input id="lead-email" placeholder="contacte@email.com" type="email"></div>
+    <div><lbl>Procedència</lbl><select id="lead-proc"><option value="">Sense indicar</option><option>Recomanació</option><option>Google</option><option>X</option><option>Instagram</option><option>Altres</option></select></div>
+    <div><lbl>Servei d'interès</lbl><select id="lead-srv"><option>Tantra Energy</option><option>Lomi Lomi</option><option>Californià</option><option>Massatges Parelles</option><option>Massatge 4 mans</option><option>Taller Tantra</option><option>Habitació 1h</option><option>Habitació 1h 30 min</option><option>Habitació 2h</option><option>Habitació 3h</option><option>Habitació +3h</option><option>Habitació per dies</option><option>Camino Santiago</option></select></div>
+    <div><lbl>Estat comercial</lbl><select id="lead-est"><option>Nou contacte</option><option>Informació enviada</option><option>Interessat</option><option>Pendent de decidir</option><option>Pendent de disponibilitat</option><option>Reserva confirmada</option><option>Perdut</option><option>No interessat</option></select></div>
+    <div><lbl>Primer contacte</lbl><input id="lead-data" type="date"></div>
+    <div><lbl>Darrera acció</lbl><input id="lead-last" type="date"></div>
+    <div><lbl>Proper seguiment</lbl><input id="lead-next" type="date"></div>
+    <div class="ff"><lbl>Notes</lbl><textarea id="lead-notes" rows="3"></textarea></div>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:space-between;margin-top:1.25rem">
+    <button class="btn btns" id="lead-del" style="color:#c0392b;visibility:hidden" onclick="deleteLead()">&#128465; Eliminar</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn btns" onclick="closeM('m-lead')">Cancel·lar</button>
+      <button class="btn btnp btns" onclick="saveLead()">Desar</button>
+    </div>
+  </div>
+</div></div>
+
 <div class="mo" id="m-nc"><div class="md">
   <div class="mh"><div class="mtt">Nou client</div><button class="xb" onclick="closeM('m-nc')">&#215;</button></div>
   <div class="fg">
@@ -590,10 +642,12 @@ var clients = ALLCLIENTS.slice();
 <script>
 
 var reminders = [];
+var leads = [];
 var nextSid = sessions.length + 1;
 var nextCid = clients.length + 1;
 var nextRid = 1;
-var cPage = 1, sPage = 1;
+var nextLid = 1;
+var cPage = 1, sPage = 1, lPage = 1;
 var PAGE = 30;
 var COLORS = ['#0b6e55','#2563eb','#b45309','#9d174d','#5b21b6','#065f46','#1e40af'];
 var sbUrl = '', sbKey = '', sbOn = false;
@@ -626,6 +680,14 @@ function fmtM(k){
 }
 function fmtNum(n){
   return String(parseInt(n)||0).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+}
+
+function esc(v){
+  return String(v==null?'':v)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
 }
 
 function fixMoji(txt){
@@ -813,6 +875,100 @@ function drawClients(){
     drawPager('c-pg',pages,cPage,function(p){ cPage=p; drawClients(); });
   }
   drawCards(sl,pages);
+}
+
+function leadEstatClass(est){
+  if(est==='Reserva confirmada') return 'bg';
+  if(est==='Perdut' || est==='No interessat') return 'br';
+  if(est==='Pendent de disponibilitat') return 'bb';
+  if(est==='Informació enviada' || est==='Interessat') return 'bp';
+  return '';
+}
+
+function leadEstatBadge(est){
+  return '<span class="badge '+leadEstatClass(est)+'">'+esc(est||'Sense estat')+'</span>';
+}
+
+function leadSegLabel(date){
+  if(!date) return '<span style="color:#bbb">Sense data</span>';
+  var t=today();
+  if(date<t) return '<span style="color:#c0392b;font-weight:700">Vençut · '+fd(date)+'</span>';
+  if(date===t) return '<span style="color:#b45309;font-weight:700">Avui · '+fd(date)+'</span>';
+  return '<span style="color:#0b6e55;font-weight:600">'+fd(date)+'</span>';
+}
+
+function filtLeads(){
+  var q=(gv('lf-q')||'').toLowerCase().trim();
+  var est=gv('lf-est'), org=gv('lf-org'), seg=gv('lf-seg'), t=today();
+  var list=leads.slice();
+  if(q) list=list.filter(function(l){
+    return String(l.nom||'').toLowerCase().indexOf(q)>=0 ||
+      String(l.telefon||'').toLowerCase().indexOf(q)>=0 ||
+      String(l.email||'').toLowerCase().indexOf(q)>=0 ||
+      String(l.servei_interes||'').toLowerCase().indexOf(q)>=0 ||
+      String(l.notes||'').toLowerCase().indexOf(q)>=0;
+  });
+  if(est) list=list.filter(function(l){ return String(l.estat||'')===est; });
+  if(org) list=list.filter(function(l){ return String(l.procedencia||'')===org; });
+  if(seg==='today') list=list.filter(function(l){ return String(l.proper_seguiment||'')===t; });
+  if(seg==='pending') list=list.filter(function(l){ return l.proper_seguiment && l.proper_seguiment<t; });
+  if(seg==='future') list=list.filter(function(l){ return l.proper_seguiment && l.proper_seguiment>t; });
+  return list.sort(function(a,b){
+    var an=a.proper_seguiment||'9999-99-99', bn=b.proper_seguiment||'9999-99-99';
+    if(an!==bn) return an.localeCompare(bn);
+    return String(b.ultima_accio||'').localeCompare(String(a.ultima_accio||''));
+  });
+}
+
+function drawLeadCards(sl,pages){
+  var el=ge('lc'), pg=ge('l-pg-mob');
+  if(!el || !pg) return;
+  el.innerHTML = sl.map(function(l){
+    return '<div class="cc-item" onclick="openLeadModal('+l.id+')">'
+      +'<div class="cc-info"><div class="cc-nom">'+esc(l.nom||'Sense nom')+'</div>'
+      +'<div class="cc-sub">'+esc(l.servei_interes||'Sense servei')+' · '+esc(l.procedencia||'Sense procedència')+'</div>'
+      +'<div class="cc-sub" style="margin-top:4px">'+leadSegLabel(l.proper_seguiment)+'</div></div>'
+      +'<div class="cc-right"><div style="font-size:11px">'+leadEstatBadge(l.estat)+'</div><div class="cc-sub">'+(l.telefon?esc(l.telefon):(l.email?esc(l.email):'Sense contacte'))+'</div></div>'
+      +'</div>';
+  }).join('');
+  pg.style.display = pages>1 ? 'flex' : 'none';
+  drawPager('l-pg-mob', pages, lPage, function(p){ lPage=p; drawLeads(); });
+}
+
+function drawLeads(){
+  var list=filtLeads();
+  var total=list.length;
+  var ven=list.filter(function(l){ return l.proper_seguiment && l.proper_seguiment<today(); }).length;
+  var avui=list.filter(function(l){ return l.proper_seguiment===today(); }).length;
+  var disp=list.filter(function(l){ return l.estat==='Pendent de disponibilitat'; }).length;
+  var pend=list.filter(function(l){ return l.estat==='Pendent de decidir' || l.estat==='Interessat' || l.estat==='Informació enviada' || l.estat==='Nou contacte'; }).length;
+  ge('l-cnt').textContent='('+total+')';
+  ge('l-met').innerHTML=''
+    +'<div class="met"><div class="mv">'+total+'</div><div class="ml">Contactes filtrats</div></div>'
+    +'<div class="met"><div class="mv">'+avui+'</div><div class="ml">Seguiment avui</div></div>'
+    +'<div class="met"><div class="mv">'+ven+'</div><div class="ml">Seguiments vençuts</div></div>'
+    +'<div class="met"><div class="mv">'+disp+'</div><div class="ml">Esperant disponibilitat</div></div>'
+    +'<div class="met"><div class="mv">'+pend+'</div><div class="ml">Pendents de tancar</div></div>';
+
+  var pages=Math.ceil(list.length/PAGE)||1;
+  if(lPage>pages) lPage=1;
+  var sl=list.slice((lPage-1)*PAGE,lPage*PAGE);
+  ge('l-tb').innerHTML = !sl.length
+    ? '<tr><td colspan="7" class="empty">Cap contacte comercial amb aquest filtre.</td></tr>'
+    : sl.map(function(l){
+        var contacte = l.telefon ? esc(l.telefon) : (l.email ? esc(l.email) : '<span style="color:#bbb">Sense telèfon</span>');
+        return '<tr>'
+          +'<td><div style="font-weight:700">'+esc(l.nom||'Sense nom')+'</div><div style="font-size:11px;color:#888">'+contacte+'</div></td>'
+          +'<td style="font-size:12px">'+esc(l.servei_interes||'')+'</td>'
+          +'<td>'+leadEstatBadge(l.estat)+'</td>'
+          +'<td style="font-size:12px">'+esc(l.procedencia||'')+'</td>'
+          +'<td style="font-size:12px">'+leadSegLabel(l.proper_seguiment)+'</td>'
+          +'<td style="font-size:12px">'+(l.ultima_accio?fd(l.ultima_accio):'<span style="color:#bbb">Sense data</span>')+'</td>'
+          +'<td style="white-space:nowrap"><button class="btn btns" onclick="openLeadModal('+l.id+')">Editar</button></td>'
+          +'</tr>';
+      }).join('');
+  drawPager('l-pg', pages, lPage, function(p){ lPage=p; drawLeads(); });
+  drawLeadCards(sl,pages);
 }
 
 function drawCards(sl,pages){
@@ -1256,6 +1412,7 @@ function goTo(page,sideEl,mobEl){
   if(mobEl) mobEl.classList.add('on');
   var bni=ge('bni-'+page); if(bni) bni.classList.add('on');
   if(page==='dashboard') drawDashboard();
+  if(page==='comercial') drawLeads();
   if(page==='pagaments') drawPagaments();
   if(page==='recordatoris') drawReminders();
   if(page==='grafiques') drawGraf();
@@ -1313,6 +1470,77 @@ function doAddReminder(){
   drawReminders(); closeM('m-nr'); refreshDashboardIfVisible();
 }
 
+function clearLeadFilters(){
+  ['lf-q','lf-est','lf-org','lf-seg'].forEach(function(id){ var e=ge(id); if(e) e.value=''; });
+  lPage=1;
+  drawLeads();
+}
+
+function openLeadModal(id){
+  var lead=null, isEdit=!!id;
+  if(isEdit){
+    for(var i=0;i<leads.length;i++){ if(leads[i].id===id){ lead=leads[i]; break; } }
+    if(!lead) return;
+  }
+  ge('lead-title').textContent=isEdit?'Editar contacte comercial':'Nou contacte comercial';
+  ge('lead-del').style.visibility=isEdit?'visible':'hidden';
+  ge('lead-id').value=isEdit?lead.id:'';
+  ge('lead-nom').value=isEdit?(lead.nom||''):'';
+  ge('lead-tel').value=isEdit?(lead.telefon||''):'';
+  ge('lead-email').value=isEdit?(lead.email||''):'';
+  ge('lead-proc').value=isEdit?(lead.procedencia||''):'';
+  ge('lead-srv').value=isEdit?(lead.servei_interes||'Tantra Energy'):'Tantra Energy';
+  ge('lead-est').value=isEdit?(lead.estat||'Nou contacte'):'Nou contacte';
+  ge('lead-data').value=isEdit?(lead.data_contacte||today()):today();
+  ge('lead-last').value=isEdit?(lead.ultima_accio||today()):today();
+  ge('lead-next').value=isEdit?(lead.proper_seguiment||''):'';
+  ge('lead-notes').value=isEdit?(lead.notes||''):'';
+  openM('m-lead');
+}
+
+function saveLead(){
+  var id=parseInt(ge('lead-id').value||0,10);
+  var nom=(gv('lead-nom')||'').trim();
+  if(!nom) return;
+  var lead={
+    id:id||nextLid++,
+    nom:nom,
+    telefon:(gv('lead-tel')||'').trim()||null,
+    email:(gv('lead-email')||'').trim()||null,
+    procedencia:gv('lead-proc')||null,
+    servei_interes:gv('lead-srv')||null,
+    estat:gv('lead-est')||'Nou contacte',
+    data_contacte:gv('lead-data')||today(),
+    ultima_accio:gv('lead-last')||today(),
+    proper_seguiment:gv('lead-next')||null,
+    notes:(gv('lead-notes')||'').trim()||null
+  };
+  if(id){
+    for(var i=0;i<leads.length;i++){ if(leads[i].id===id){ leads[i]=Object.assign({}, leads[i], lead); break; } }
+  }else{
+    leads.unshift(lead);
+  }
+  saveLocalBackup(true);
+  closeM('m-lead');
+  lPage=1;
+  drawLeads();
+  refreshDashboardIfVisible();
+}
+
+function deleteLead(){
+  var id=parseInt(ge('lead-id').value||0,10);
+  if(!id) return;
+  var lead=null;
+  for(var i=0;i<leads.length;i++){ if(leads[i].id===id){ lead=leads[i]; break; } }
+  if(!lead) return;
+  if(!confirm('Eliminar aquest contacte comercial de '+lead.nom+'?')) return;
+  leads = leads.filter(function(l){ return l.id!==id; });
+  saveLocalBackup(true);
+  closeM('m-lead');
+  drawLeads();
+  refreshDashboardIfVisible();
+}
+
 function saveCreds(url,key){ try{ localStorage.setItem('sb_url',url); localStorage.setItem('sb_key',key); }catch(e){} }
 function loadCreds(){ try{ return{url:localStorage.getItem('sb_url')||'',key:localStorage.getItem('sb_key')||''}; }catch(e){ return{url:'',key:''}; } }
 function clearCreds(){ try{ localStorage.removeItem('sb_url'); localStorage.removeItem('sb_key'); }catch(e){} }
@@ -1325,10 +1553,12 @@ function backupPayload(){
     clients:clients,
     sessions:sessions,
     reminders:reminders,
+    leads:leads,
     despeses:despeses,
     nextCid:nextCid,
     nextSid:nextSid,
     nextRid:nextRid,
+    nextLid:nextLid,
     nextDid:nextDid
   };
 }
@@ -1339,8 +1569,8 @@ function updateBackupInfo(){
     if(!raw){ e.textContent='Encara no hi ha cap backup local.'; return; }
     var data=JSON.parse(raw);
     var when=data && data.saved_at ? data.saved_at.replace('T',' ').slice(0,16) : 'data desconeguda';
-    var c=(data.clients||[]).length, s=(data.sessions||[]).length;
-    e.textContent='Últim backup: '+when+' · '+c+' clients · '+s+' sessions';
+    var c=(data.clients||[]).length, s=(data.sessions||[]).length, l=(data.leads||[]).length;
+    e.textContent='Últim backup: '+when+' · '+c+' clients · '+s+' sessions · '+l+' comercials';
   }catch(err){
     e.textContent='No s ha pogut llegir el backup local.';
   }
@@ -1350,12 +1580,15 @@ function applyBackupPayload(data){
   clients = data.clients;
   sessions = data.sessions;
   reminders = data.reminders;
+  leads = Array.isArray(data.leads) ? data.leads : [];
   despeses = data.despeses;
-  fixDeep(clients); fixDeep(sessions); fixDeep(reminders); fixDeep(despeses);
+  fixDeep(clients); fixDeep(sessions); fixDeep(reminders); fixDeep(leads); fixDeep(despeses);
   nextCid = data.nextCid || (Math.max.apply(null, clients.map(function(c){ return c.id||0; }).concat([0])) + 1);
   nextSid = data.nextSid || (Math.max.apply(null, sessions.map(function(s){ return s.id||0; }).concat([0])) + 1);
   nextRid = data.nextRid || (Math.max.apply(null, reminders.map(function(r){ return r.id||0; }).concat([0])) + 1);
+  nextLid = data.nextLid || (Math.max.apply(null, leads.map(function(l){ return l.id||0; }).concat([0])) + 1);
   nextDid = data.nextDid || (Math.max.apply(null, despeses.map(function(d){ return d.id||0; }).concat([0])) + 1);
+  drawLeads();
   drawClients();
   drawSessions();
   drawReminders();
@@ -1505,7 +1738,7 @@ async function loadFromSb(){
   anys.sort().reverse();
   var ayEl=ge('gf-any');
   if(ayEl) anys.forEach(function(y){ var o=document.createElement('option'); o.value=y; o.textContent=y; ayEl.appendChild(o); });
-  drawClients(); drawSessions();
+  drawClients(); drawSessions(); drawLeads();
   var creds=loadCreds();
   if(creds.url&&creds.key){
     var urlEl=ge('sb-url'); if(urlEl) urlEl.value=creds.url;
@@ -2470,6 +2703,7 @@ document.addEventListener('DOMContentLoaded', function(){
     fixDeep(clients);
     fixDeep(sessions);
     fixDeep(reminders);
+    fixDeep(leads);
     fixDeep(despeses);
     sanitizeDom(document.body);
     var observer = new MutationObserver(function(){
@@ -2482,6 +2716,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   try{
     if(typeof drawDashboard === 'function') drawDashboard();
+    if(typeof drawLeads === 'function') drawLeads();
     if(typeof drawClients === 'function') drawClients();
     if(typeof drawSessions === 'function') drawSessions();
     updateBackupInfo();
