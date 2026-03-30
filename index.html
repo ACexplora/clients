@@ -122,11 +122,13 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 .hero-title{font-size:18px;font-weight:800;color:#0b6e55;margin-bottom:6px}
 .hero-sub{font-size:13px;color:#5d6b66;line-height:1.5;max-width:720px}
 .hero-pill{padding:8px 12px;border-radius:999px;background:#fff;border:1px solid #d9ebe4;font-size:11px;font-weight:700;color:#0b6e55}
+.mactions{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem}
 @media(max-width:700px){
   .kpi-grid{grid-template-columns:1fr 1fr}
   .split-bars{grid-template-columns:1fr;padding-bottom:4px}
   .split-col{min-width:0}
   .dash-grid{grid-template-columns:1fr}
+  .mactions{position:sticky;bottom:0;background:#fff;padding-top:12px;padding-bottom:4px;border-top:1px solid #f0ede8}
 }
 /* MOBILE CARDS */
 .cc-list{display:none;flex-direction:column;gap:8px;margin-bottom:1rem}
@@ -499,7 +501,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
     <div><lbl>Pagat a compte (&#8364;)</lbl><input id="nscompte" type="number" min="0" placeholder="0"></div>
     <div class="ff"><lbl>Notes internes</lbl><textarea id="nsnotes" rows="2"></textarea></div>
   </div>
-  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
+  <div class="mactions">
     <button class="btn btns" onclick="closeM('m-ns')">Cancel&#183;lar</button>
     <button class="btn btnp btns" onclick="doAddSession()">Desar</button>
   </div>
@@ -612,6 +614,11 @@ function fd(d){
   return p.length<3?d:p[2]+'/'+p[1]+'/'+p[0];
 }
 
+function ymLocal(date){
+  var y=date.getFullYear(), m=date.getMonth()+1;
+  return y+'-'+(m<10?'0':'')+m;
+}
+
 function fmtM(k){
   var mn=['','Gen','Feb','Mar','Abr','Mai','Jun','Jul','Ago','Set','Oct','Nov','Des'];
   var p=String(k).split('-');
@@ -708,7 +715,7 @@ function catOf(s){
   return 'Habitació per hores';
 }
 function today(){ return new Date().toISOString().split('T')[0]; }
-function mesKey(off){ var d=new Date(); d.setMonth(d.getMonth()+off); return d.toISOString().slice(0,7); }
+function mesKey(off){ var d=new Date(); d.setDate(1); d.setMonth(d.getMonth()+off); return ymLocal(d); }
 
 function drawPager(elId,pages,cur,cb){
   var el=ge(elId); if(!el) return;
@@ -951,7 +958,7 @@ function drawPagaments(){
     +'<div class="met"><div class="mv">'+nC+'</div><div class="ml">Completades</div></div>'
     +'<div class="met"><div class="mv">'+fmtNum(tiq)+'â‚¬</div><div class="ml">Tiquet mitjÃ </div></div>';
   var months=[];
-  for(var i=11;i>=0;i--){ var d=new Date(); d.setMonth(d.getMonth()-i); months.push(d.toISOString().slice(0,7)); }
+  for(var i=11;i>=0;i--){ var d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i); months.push(ymLocal(d)); }
   var vals=months.map(function(m){ return paid.filter(function(s){ return String(s.data).startsWith(m); }).reduce(function(a,s){ return a+s.preu; },0); });
   var maxV=Math.max.apply(null,vals.concat([1]));
   ge('p-bars').innerHTML=vals.map(function(v,i){
@@ -1107,7 +1114,7 @@ function drawGraf(){
   var fy=gv('gf-any'),ft=gv('gf-ter'),fc2=gv('gf-cat'),fs2=gv('gf-srv');
   var evoMonths=[];
   if(fy){ for(var m=1;m<=12;m++) evoMonths.push(fy+'-'+(m<10?'0':'')+m); ge('g-evlbl').textContent='Evolució mensual '+fy; }
-  else{ for(var i=11;i>=0;i--){ var d2=new Date(); d2.setMonth(d2.getMonth()-i); evoMonths.push(d2.toISOString().slice(0,7)); } ge('g-evlbl').textContent='Evolució (últims 12 mesos)'; }
+  else{ for(var i=11;i>=0;i--){ var d2=new Date(); d2.setDate(1); d2.setMonth(d2.getMonth()-i); evoMonths.push(ymLocal(d2)); } ge('g-evlbl').textContent='Evolució (últims 12 mesos)'; }
   var evoBase=sessions;
   if(ft) evoBase=evoBase.filter(function(s){ return s.terapeuta===ft; });
   if(fc2) evoBase=evoBase.filter(function(s){ return s.categoria===fc2; });
@@ -1992,7 +1999,7 @@ function drawDespesesChart() {
   if(fy) {
     for(var m=1;m<=12;m++) months.push(fy+'-'+(m<10?'0':'')+m);
   } else {
-    for(var i=11;i>=0;i--){ var d=new Date(); d.setMonth(d.getMonth()-i); months.push(d.toISOString().slice(0,7)); }
+    for(var i=11;i>=0;i--){ var d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i); months.push(ymLocal(d)); }
   }
   if(fm) months = months.filter(function(m){ return m.slice(5,7)===fm; });
 
