@@ -682,6 +682,12 @@ function fmtNum(n){
   return String(parseInt(n)||0).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
 }
 
+function sortDateTimeAsc(a,b){
+  var ak=(String(a.data||'')+' '+String(a.hora||'99:99'));
+  var bk=(String(b.data||'')+' '+String(b.hora||'99:99'));
+  return ak.localeCompare(bk);
+}
+
 function esc(v){
   return String(v==null?'':v)
     .replace(/&/g,'&amp;')
@@ -1765,7 +1771,8 @@ function calEventClass(s) {
 
 function calEventLabel(s) {
   var hora = s.hora ? s.hora + ' ' : '';
-  return hora + String(s.client||'').split(' ')[0] + ' Â· ' + String(s.servei||'');
+  var code = s.codi ? ' [' + s.codi + ']' : '';
+  return hora + String(s.client||'').split(' ')[0] + code + ' Â· ' + String(s.servei||'');
 }
 
 function calEventFull(s) {
@@ -1872,7 +1879,7 @@ function drawCalMes() {
 
     var evs = byDate[dateStr] || [];
     // Sort by time
-    evs.sort(function(a,b){ return String(a.hora||'').localeCompare(String(b.hora||'')); });
+    evs.sort(sortDateTimeAsc);
 
     h += '<td' + (isToday?' class="today"':'') + '>';
     h += '<div class="cal-day-num">' + d + '</div>';
@@ -1922,7 +1929,7 @@ function drawCalSetmana() {
   days.forEach(function(d){
     var ds = d.toISOString().slice(0,10);
     weekSessions[ds] = sessions.filter(function(s){ return s.data === ds; })
-      .sort(function(a,b){ return String(a.hora||'').localeCompare(String(b.hora||'')); });
+      .sort(sortDateTimeAsc);
   });
 
   // Build header
