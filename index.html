@@ -1769,10 +1769,8 @@ var calView = 'mes';
 var calDate = new Date();
 
 function calEventClass(s) {
-  if(s.estat === 'Programat') return 'prog';
-  if(s.categoria === 'HabitaciÃ³ per hores' || (s.servei||'').indexOf('Habitaci') >= 0) return 'hab';
-  if(s.terapeuta === 'Angela & Carles') return 'both';
-  if((s.terapeuta||'').indexOf('Angela') >= 0) return 'angela';
+  if(s.categoria === 'Habitació per hores' || s.categoria === 'HabitaciÃ³ per hores') return 'hab';
+  if(s.categoria === 'Habitació per dies' || s.categoria === 'HabitaciÃ³ per dies') return 'dies';
   return '';
 }
 
