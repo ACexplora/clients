@@ -185,7 +185,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 .cal-event.angela{background:#9d174d}
 .cal-event.both{background:#b45309}
 .cal-event.hab{background:#1e40af}
-.cal-event.dies{background:#0e7490}
+.cal-event.dies{background:#8b5e3c}
 .cal-event.prog{background:#6b7280;opacity:.8}
 .cal-more{font-size:10px;color:#0b6e55;font-weight:600;cursor:pointer}
 /* Weekly */
@@ -199,7 +199,7 @@ lbl{font-size:11px;color:#666;font-weight:600;display:block;margin-bottom:4px}
 .cal-week-event.angela{background:#9d174d}
 .cal-week-event.both{background:#b45309}
 .cal-week-event.hab{background:#1e40af}
-.cal-week-event.dies{background:#0e7490}
+.cal-week-event.dies{background:#8b5e3c}
 .cal-week-event.prog{background:#6b7280;opacity:.8}
 /* Event popup */
 .cal-popup{position:fixed;background:#fff;border:1px solid #e5e3de;border-radius:10px;padding:1rem;box-shadow:0 8px 30px rgba(0,0,0,.15);z-index:150;min-width:220px;max-width:280px}
@@ -1159,8 +1159,8 @@ function drawReminders(){
     html+=prog.map(function(s){
       var cId='';
       for(var ci=0;ci<clients.length;ci++){ if(clients[ci].nom===s.client){ cId=clients[ci].id; break; } }
-      var cls=calEventClass(s);
-      var catColor = cls==='hab' ? '#1e40af' : cls==='dies' ? '#0e7490' : '#0b6e55';
+      var cls=agendaCatClass(s);
+      var catColor = cls==='hab' ? '#1e40af' : cls==='dies' ? '#8b5e3c' : '#0b6e55';
       return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f0ede8">'
         +'<div style="min-width:75px;font-size:11px;color:#999">'+fd(s.data)+'<br>'+(s.hora||'')+'</div>'
         +'<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+String(s.client||'')+'</div>'
@@ -1769,6 +1769,13 @@ var calView = 'mes';
 var calDate = new Date();
 
 function calEventClass(s) {
+  if(s.estat === 'Programat') return 'prog';
+  if(s.categoria === 'Habitació per hores' || s.categoria === 'HabitaciÃ³ per hores') return 'hab';
+  if(s.categoria === 'Habitació per dies' || s.categoria === 'HabitaciÃ³ per dies') return 'dies';
+  return '';
+}
+
+function agendaCatClass(s){
   if(s.categoria === 'Habitació per hores' || s.categoria === 'HabitaciÃ³ per hores') return 'hab';
   if(s.categoria === 'Habitació per dies' || s.categoria === 'HabitaciÃ³ per dies') return 'dies';
   return '';
